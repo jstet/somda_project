@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "somda-project"
+name = "somda_project"
 version = "0.1.0"
 description = ""
 authors = ["Jonas Stettner <mail@jstet.net>"]
@@ -11,12 +11,18 @@ python = "^3.11"
 pandas = "^2.0.3"
 requests = "^2.31.0"
 bs4 = "^0.0.1"
+modal-client = "^0.50.2562"
+minio = "^7.1.15"
+python-dotenv = "^1.0.0"
+rich = "^13.4.2"
+tqdm = "^4.65.0"
 
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
 ruff = "^0.0.276"
 pre-commit = "^3.3.3"
+pytest = "^7.4.0"
 
 [build-system]
 requires = ["poetry-core"]
