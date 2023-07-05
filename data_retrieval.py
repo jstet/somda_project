@@ -1,4 +1,4 @@
-from somda_project.helpers import gen_urls_old_wiki, download_file
+from somda_project.pipelines import pipe_wiki_views
 import modal
 
 image = modal.Image.debian_slim().poetry_install_from_file("pyproject.toml")
@@ -6,11 +6,9 @@ image = modal.Image.debian_slim().poetry_install_from_file("pyproject.toml")
 stub = modal.Stub(name="somda_project")
 
 
-@stub.function(image=image)
+@stub.function(image=image, timeout=1000)
 def f():
-    print("Hu")
-    urls = gen_urls_old_wiki()
-    download_file(urls[0])
+    pipe_wiki_views()
 
 
 @stub.local_entrypoint()

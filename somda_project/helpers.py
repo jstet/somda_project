@@ -4,7 +4,8 @@ import os
 import requests
 import time
 import urllib
-import pandas as pd
+import re
+from contextlib import ExitStack
 import pyarrow as pa
 import pyarrow.parquet as pq
 import bz2
@@ -49,77 +50,126 @@ def download_file(url):
     return filepath, url["id"]
 
 
-def to_parquet(input_filepath, id):
-    # Define chunk size (adjust as needed)
+hour_mapping = {
+    "A": 0,
+    "B": 1,
+    "C": 2,
+    "D": 3,
+    "E": 4,
+    "F": 5,
+    "G": 6,
+    "H": 7,
+    "I": 8,
+    "J": 9,
+    "K": 10,
+    "L": 11,
+    "M": 12,
+    "N": 13,
+    "O": 14,
+    "P": 15,
+    "Q": 16,
+    "R": 17,
+    "S": 18,
+    "T": 19,
+    "U": 20,
+    "V": 21,
+    "W": 22,
+    "X": 23,
+}
+
+
+def decipher_hours(hourly_counts):
+    hour_dict = {}
+    for hour_char in hour_mapping:
+        hour_dict[hour_mapping[hour_char]] = 0
+    while hourly_counts:
+        hour_char = hourly_counts[0]
+        hour = hour_mapping[hour_char]
+
+        visits = ""
+        for char in hourly_counts[1:]:
+            if char.isdigit():
+                visits += char
+            else:
+                break
+
+        hour_dict[hour] = int(visits)
+        hourly_counts = hourly_counts[len(str(visits)) + 1 :]
+
+    return hour_dict
+
+
+def process_data_line(line):
+    parts = line.strip().split(" ")
+    wikicode = urllib.parse.unquote(parts[0])
+    article_title = urllib.parse.unquote(parts[1])
+    daily_total = int(parts[-2])
+    hourly_counts = parts[-1]
+    dct = {
+        "wikicode": wikicode,
+        "article_title": article_title,
+        "daily_total": daily_total,
+        "hourly_counts": hourly_counts,
+    }
+    # keep only stuff from wikipedia project and only articles (they don't start with a namespace)
+    if "wikipedia" in dct["wikicode"] and not re.match(r"^\w+:", dct["article_title"]):
+        return dct
+
+
+def bz2_to_parquet(input_filepath, id_):
     chunk_size = 100000
+    output_file = f"{id_}.parquet"
 
-    # Define input and output file paths
-    output_file = f"output_file_{id}.parquet"
-
-    # Define Parquet schema
     parquet_schema = pa.schema(
         [
-            ("wiki_code", pa.string()),
+            ("wikicode", pa.string()),
             ("article_title", pa.string()),
             ("daily_total", pa.int64()),
             ("hourly_counts", pa.string()),
         ]
     )
 
-    print(f"Starting conversion for {id}")
+    console.log(f"Starting conversion for {id_}")
     start_time = time.time()
     last_update_time = start_time
 
-    # Open the input file in chunks
-    with bz2.open(input_filepath, "rt") as file:
-        # Create an empty Parquet file writer
+    with bz2.open(input_filepath, "rt") as file, ExitStack() as stack:
         parquet_writer = None
-        # Read and process the file in chunks
         while True:
-            # Read a chunk of data
             chunk = []
             for _ in range(chunk_size):
                 line = file.readline()
                 if not line:
                     break
-                parts = line.strip().split(" ")
-                wikicode = urllib.parse.unquote(parts[0])
-                article_title = urllib.parse.unquote(parts[1])
 
-                daily_total = int(parts[-2])
-                hourly_counts = " ".join(parts[-1])
+                dct = process_data_line(line)
 
-                chunk.append((wikicode, article_title, daily_total, hourly_counts))
+                if dct is not None:
+                    chunk.append(dct)
 
-            # Break the loop if no more data is available
-            if not chunk:
+            if chunk:
+                arrays = [pa.array([row[col] for row in chunk]) for col in chunk[0]]
+                table = pa.Table.from_arrays(arrays, schema=parquet_schema)
+                if parquet_writer is None:
+                    parquet_writer = stack.enter_context(pq.ParquetWriter(output_file, parquet_schema))
+
+                parquet_writer.write_table(table)
+
+            if not line:
                 break
 
-            # Convert the chunk to a Pandas DataFrame
-            df = pd.DataFrame(chunk, columns=["wiki_code", "article_title", "daily_total", "hourly_counts"])
-
-            # Convert the DataFrame to a PyArrow table
-            table = pa.Table.from_pandas(df, schema=parquet_schema)
-            print(df.iloc[0])
-
-            # Initialize the Parquet file writer if it hasn't been created
-            if parquet_writer is None:
-                parquet_writer = pq.ParquetWriter(output_file, parquet_schema)
-
-            # Write the chunk to the Parquet file
-            parquet_writer.write_table(table)
-
-            # Print progress every 10 seconds
             current_time = time.time()
             elapsed_time = current_time - last_update_time
             if elapsed_time >= 10:
                 last_update_time = current_time
                 file_position = file.tell()
-                print(f"Current position in uncompressed file: {round(file_position / (1024 ** 3), 2)} GB")
+                console.log(
+                    f"Current position in uncompressed file with id {id_}: {round(file_position / (1024 ** 3), 2)} GB"
+                )
 
-        # Close the Parquet file writer
-        if parquet_writer is not None:
-            parquet_writer.close()
+    if parquet_writer is not None:
+        parquet_writer.close()
 
-    print(f"File converted to Parquet: {output_file}")
-    print(f"Conversion time: {round(time.time() - start_time, 2)} seconds")
+    return output_file
+
+    console.log(f"Conversion time for {id_}: {round(time.time() - start_time, 2)} seconds")
