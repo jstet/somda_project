@@ -5,3 +5,10 @@ Final project of the course "[Social Media Data Analysis](https://github.com/dga
 
 ### Data Sources:
 - Pageview complete dumps. (2020, November 24). Retrieved from https://dumps.wikimedia.org/other/pageview_complete/readme.html
+
+
+
+#### Notes
+
+- First, we recorded the amount of views the page of the political party in question in the corresponding Wikipedia language edition received in the week before the election. 
+

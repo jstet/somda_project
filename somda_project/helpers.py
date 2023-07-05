@@ -11,21 +11,42 @@ import pyarrow.parquet as pq
 import bz2
 
 
-def gen_urls_old_wiki():
+def gen_urls():
     base_url = "https://dumps.wikimedia.org/other/pageview_complete/"
+    elections = [
+        {"name": "Europawahl 2014", "start_date": (2014, 5, 22), "end_date": (2014, 5, 25)},
+        {"name": "Europawahl 2019", "start_date": (2019, 5, 23), "end_date": (2019, 5, 26)},
+    ]
+    num_days_before = 7  # Number of days before the election to include
+    num_days_after = 7  # Number of days after the election to include
 
-    start_year = 2013
-    end_year = 2015
     urls = []
 
-    for year in range(start_year, end_year + 1):
-        for month in range(1, 13):
-            if year == end_year and month > 6:
-                break
-            num_days = calendar.monthrange(year, month)[1]
-            for day in range(1, num_days + 1):
-                url = f"{base_url}{year}/{year}-{month:02d}/pageviews-{year}{month:02d}{day:02d}-user.bz2"
-                urls.append({"url": url, "id": f"{year}{month:02d}{day:02d}"})
+    for election in elections:
+        start_date = (
+            election["start_date"][0],
+            election["start_date"][1],
+            election["start_date"][2] - num_days_before,
+        )
+        end_date = (
+            election["end_date"][0],
+            election["end_date"][1],
+            election["end_date"][2] + num_days_after,
+        )
+
+        for year in range(start_date[0], end_date[0] + 1):
+            for month in range(1, 13):
+                if (year == start_date[0] and month < start_date[1]) or (year == end_date[0] and month > end_date[1]):
+                    continue
+
+                num_days = calendar.monthrange(year, month)[1]
+
+                for day in range(1, num_days + 1):
+                    date = (year, month, day)
+
+                    if start_date <= date <= end_date:
+                        url = f"{base_url}{year}/{year}-{month:02d}/pageviews-{year}{month:02d}{day:02d}-user.bz2"
+                        urls.append({"url": url, "id": f"{year}_{month:02d}_{day:02d}", "election": election["name"]})
 
     return urls
 
@@ -45,7 +66,7 @@ def download_file(url):
                     downloaded = output.tell()
                     speed = downloaded / elapsed_time
                     progress = min(downloaded / total_length, 1.0) * 100
-                    console.log(f"Progress: {progress:.2f}%, Speed: {speed:.2f} B/s")
+                    console.log(f"ID: {url['id']} Progress: {progress:.2f}%, Speed: {speed:.2f} B/s")
                     update_time += 10
     return filepath, url["id"]
 
@@ -100,20 +121,26 @@ def decipher_hours(hourly_counts):
 
 
 def process_data_line(line):
-    parts = line.strip().split(" ")
-    wikicode = urllib.parse.unquote(parts[0])
-    article_title = urllib.parse.unquote(parts[1])
-    daily_total = int(parts[-2])
-    hourly_counts = parts[-1]
-    dct = {
-        "wikicode": wikicode,
-        "article_title": article_title,
-        "daily_total": daily_total,
-        "hourly_counts": hourly_counts,
-    }
-    # keep only stuff from wikipedia project and only articles (they don't start with a namespace)
-    if "wikipedia" in dct["wikicode"] and not re.match(r"^\w+:", dct["article_title"]):
-        return dct
+    try:
+        parts = line.strip().split(" ")
+        wikicode = urllib.parse.unquote(parts[0])
+        article_title = urllib.parse.unquote(parts[1])
+        daily_total = int(parts[-2])
+        hourly_counts = parts[-1]
+        dct = {
+            "wikicode": wikicode,
+            "article_title": article_title,
+            "daily_total": daily_total,
+            "hourly_counts": hourly_counts,
+        }
+        # keep only stuff from wikipedia project and only articles (they don't start with a namespace)
+        if "wikipedia" in dct["wikicode"] and not re.match(r"^\w+:", dct["article_title"]):
+            return dct
+    # sometimes its a line like: "de.wikipedia Versuchstelle_Gottow"
+    except ValueError as e:
+        print(e)
+        print(line)
+        return None
 
 
 def bz2_to_parquet(input_filepath, id_):
