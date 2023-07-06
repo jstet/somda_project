@@ -1,4 +1,5 @@
 from somda_project.processing import extract_page, extract_election_page_timeseries, explode_timeseries
+from somda_project.data import eu_elections, add_turnout
 import importlib_resources
 import os
 import pandas as pd
@@ -62,3 +63,7 @@ def test_extract_election_page_timeseries():
     path = extract_election_page_timeseries(path, "2014_05_16", 2014)
     assert isinstance(path, str)
     os.remove(path)
+
+
+def test_add_turnour():
+    print(add_turnout(eu_elections))
