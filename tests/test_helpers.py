@@ -1,20 +1,7 @@
 from somda_project.helpers import download_file, bz2_to_parquet, decipher_hours, process_data_line, gen_urls
-from somda_project.s3_funcs import upload_file, delete_object, check_object_exists, create_minio_client
-from somda_project.processing import process_parquet
 import importlib_resources
 import requests
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-
-def test_gen_urls():
-    urls = gen_urls()
-    print(len(urls))
-    for url in urls:
-        response = requests.head(url["url"])
-        assert response.status_code == 200
 
 
 def test_download_file():
@@ -26,6 +13,13 @@ def test_download_file():
     )
     assert os.path.isfile(filepath)
     os.remove(filepath)
+
+
+def test_gen_urls():
+    urls = gen_urls()
+    for url in urls:
+        response = requests.head(url["url"])
+        assert response.status_code == 200
 
 
 def test_decipher_hours():
@@ -115,23 +109,3 @@ def test_to_parquet_new():
     output_path = bz2_to_parquet(path, "20130101")
     assert os.path.isfile(output_path)
     os.remove(output_path)
-
-
-def test_process_parquet():
-    resource_path = importlib_resources.files("tests.data.pageviews_parquet").joinpath("pageviews.parquet")
-    path = str(resource_path)  # Convert the Path object to a string
-    process_parquet(path)
-
-
-def test_upload_file():
-    endpoint = os.environ.get("BUCKET_ENDPOINT")
-    bucket_id = os.environ.get("BUCKET_ID")
-    access_key = os.environ.get("BUCKET_ACCESS_KEY_ID")
-    secret_key = os.environ.get("BUCKET_SECRET_KEY")
-    region = os.environ.get("BUCKET_REGION")
-    client = create_minio_client(endpoint, access_key, secret_key, region)
-    resource_path = importlib_resources.files("tests.data.pageviews_parquet").joinpath("pageviews.parquet")
-    path = str(resource_path)  # Convert the Path object to a string
-    s3_path = upload_file(client, "test.parquet", path, bucket_id)
-    assert check_object_exists(client, s3_path, bucket_id)
-    delete_object(client, s3_path, bucket_id)

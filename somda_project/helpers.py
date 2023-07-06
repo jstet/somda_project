@@ -46,7 +46,9 @@ def gen_urls():
 
                     if start_date <= date <= end_date:
                         url = f"{base_url}{year}/{year}-{month:02d}/pageviews-{year}{month:02d}{day:02d}-user.bz2"
-                        urls.append({"url": url, "id": f"{year}_{month:02d}_{day:02d}", "election": election["name"]})
+                        urls.append(
+                            {"url": url, "id": f"{year}_{month:02d}_{day:02d}", "year": election["start_date"][0]}
+                        )
 
     return urls
 
