@@ -202,3 +202,12 @@ def bz2_to_parquet(input_filepath, id_):
     return output_file
 
     console.log(f"Conversion time for {id_}: {round(time.time() - start_time, 2)} seconds")
+
+
+def get_env_vars(environ):
+    endpoint = environ.get("BUCKET_ENDPOINT")
+    bucket_id = environ.get("BUCKET_ID")
+    access_key = environ.get("BUCKET_ACCESS_KEY_ID")
+    secret_key = environ.get("BUCKET_SECRET_KEY")
+    region = environ.get("BUCKET_REGION")
+    return endpoint, bucket_id, access_key, secret_key, region

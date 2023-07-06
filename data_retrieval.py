@@ -1,8 +1,11 @@
 from somda_project.pipelines import get_upload_parquet, get_timeseries_day, concat_csvs
-from somda_project.helpers import gen_urls
-from somda_project.s3_funcs import create_minio_client
+from somda_project.helpers import gen_urls, get_env_vars
+from somda_project.s3_funcs import create_minio_client, retrieve_file
+from dotenv import load_dotenv
 import modal
 import os
+
+load_dotenv()
 
 image = modal.Image.debian_slim().poetry_install_from_file("pyproject.toml")
 
@@ -11,33 +14,21 @@ stub = modal.Stub(name="somda_project")
 
 @stub.function(image=image, timeout=1000, secret=modal.Secret.from_dotenv(__file__))
 def f1(url):
-    endpoint = os.environ.get("BUCKET_ENDPOINT")
-    bucket_id = os.environ.get("BUCKET_ID")
-    access_key = os.environ.get("BUCKET_ACCESS_KEY_ID")
-    secret_key = os.environ.get("BUCKET_SECRET_KEY")
-    region = os.environ.get("BUCKET_REGION")
+    endpoint, bucket_id, access_key, secret_key, region = get_env_vars(os.environ)
     client = create_minio_client(endpoint, access_key, secret_key, region)
     get_upload_parquet(url, client, bucket_id)
 
 
 @stub.function(image=image, timeout=1000, secret=modal.Secret.from_dotenv(__file__))
 def f2(url):
-    endpoint = os.environ.get("BUCKET_ENDPOINT")
-    bucket_id = os.environ.get("BUCKET_ID")
-    access_key = os.environ.get("BUCKET_ACCESS_KEY_ID")
-    secret_key = os.environ.get("BUCKET_SECRET_KEY")
-    region = os.environ.get("BUCKET_REGION")
+    endpoint, bucket_id, access_key, secret_key, region = get_env_vars(os.environ)
     client = create_minio_client(endpoint, access_key, secret_key, region)
     return get_timeseries_day(url, client, bucket_id)
 
 
 @stub.function(image=image, timeout=1000, secret=modal.Secret.from_dotenv(__file__))
 def f3(urls):
-    endpoint = os.environ.get("BUCKET_ENDPOINT")
-    bucket_id = os.environ.get("BUCKET_ID")
-    access_key = os.environ.get("BUCKET_ACCESS_KEY_ID")
-    secret_key = os.environ.get("BUCKET_SECRET_KEY")
-    region = os.environ.get("BUCKET_REGION")
+    endpoint, bucket_id, access_key, secret_key, region = get_env_vars(os.environ)
     client = create_minio_client(endpoint, access_key, secret_key, region)
     return concat_csvs(urls, client, bucket_id)
 
@@ -49,7 +40,17 @@ def f4():
 
 @stub.local_entrypoint()
 def main():
-    urls = f4.call()
-    list(f1.map(urls))
-    list(f2.map(urls))
-    f3.call(urls)
+    endpoint, bucket_id, access_key, secret_key, region = get_env_vars(os.environ)
+    print(endpoint)
+    client = create_minio_client(endpoint, access_key, secret_key, region)
+    # urls = f4.call()
+    # list(f1.map(urls))
+    # list(f2.map(urls))
+    # f3.call(urls)
+    csv = retrieve_file(client, "merged_election_pages.csv", bucket_id)
+    print(csv, type(csv))
+    if os.path.exists(csv):
+        os.replace(f"./{csv}", f"./data/{csv}")
+        print("File moved successfully.")
+    else:
+        print("File does not exist.")
