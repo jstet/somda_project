@@ -1,17 +1,24 @@
 import calendar
 from somda_project.console import console
-import os
-import requests
+from somda_project.processing import process_data_line
 import time
-import urllib
-import re
 from contextlib import ExitStack
 import pyarrow as pa
 import pyarrow.parquet as pq
+from typing import List, Dict
 import bz2
 
 
-def gen_urls():
+def gen_urls() -> List[Dict[str, object]]:
+    """
+    Generates a list of URLs for downloading pageview data related to specific elections.
+
+    Returns:
+        A list of dictionaries, each containing the following information for a specific URL:
+        - 'url': The URL for downloading the pageview data.
+        - 'id': The identifier for the specific date of the pageview data (in the format 'YYYY_MM_DD').
+        - 'year': The year of the election associated with the pageview data.
+    """
     base_url = "https://dumps.wikimedia.org/other/pageview_complete/"
     elections = [
         {"name": "Europawahl 2014", "start_date": (2014, 5, 22), "end_date": (2014, 5, 25)},
@@ -53,99 +60,29 @@ def gen_urls():
     return urls
 
 
-def download_file(url):
-    console.log(f"Starting download for {url['id']}")
-    with requests.get(url["url"], stream=True) as raw:
-        total_length = int(raw.headers.get("Content-Length"))
-        filepath = f"temp_{os.path.basename(url['id'])}.bz2"
-        with open(filepath, "wb") as output:
-            start_time = time.time()
-            update_time = start_time + 10
-            for chunk in raw:
-                output.write(chunk)
-                if time.time() >= update_time:
-                    elapsed_time = time.time() - start_time
-                    downloaded = output.tell()
-                    speed = downloaded / elapsed_time
-                    progress = min(downloaded / total_length, 1.0) * 100
-                    console.log(f"ID: {url['id']} Progress: {progress:.2f}%, Speed: {speed:.2f} B/s")
-                    update_time += 10
-    return filepath, url["id"]
+def bz2_to_parquet(input_filepath: str, id_: str) -> str:
+    """
+    Converts a BZ2 file to Parquet format, filtering and processing the data.
 
+    Args:
+        input_filepath (str): The path to the input BZ2 file.
+        id_ (str): The identifier associated with the data.
 
-hour_mapping = {
-    "A": 0,
-    "B": 1,
-    "C": 2,
-    "D": 3,
-    "E": 4,
-    "F": 5,
-    "G": 6,
-    "H": 7,
-    "I": 8,
-    "J": 9,
-    "K": 10,
-    "L": 11,
-    "M": 12,
-    "N": 13,
-    "O": 14,
-    "P": 15,
-    "Q": 16,
-    "R": 17,
-    "S": 18,
-    "T": 19,
-    "U": 20,
-    "V": 21,
-    "W": 22,
-    "X": 23,
-}
+    Returns:
+        str: The path to the output Parquet file.
 
-
-def decipher_hours(hourly_counts):
-    hour_dict = {}
-    for hour_char in hour_mapping:
-        hour_dict[hour_mapping[hour_char]] = 0
-    while hourly_counts:
-        hour_char = hourly_counts[0]
-        hour = hour_mapping[hour_char]
-
-        visits = ""
-        for char in hourly_counts[1:]:
-            if char.isdigit():
-                visits += char
-            else:
-                break
-
-        hour_dict[hour] = int(visits)
-        hourly_counts = hourly_counts[len(str(visits)) + 1 :]
-
-    return hour_dict
-
-
-def process_data_line(line):
-    try:
-        parts = line.strip().split(" ")
-        wikicode = urllib.parse.unquote(parts[0])
-        article_title = urllib.parse.unquote(parts[1])
-        daily_total = int(parts[-2])
-        hourly_counts = parts[-1]
-        dct = {
-            "wikicode": wikicode,
-            "article_title": article_title,
-            "daily_total": daily_total,
-            "hourly_counts": hourly_counts,
-        }
-        # keep only stuff from wikipedia project and only articles (they don't start with a namespace)
-        if "wikipedia" in dct["wikicode"] and not re.match(r"^\w+:", dct["article_title"]):
-            return dct
-    # sometimes its a line like: "de.wikipedia Versuchstelle_Gottow"
-    except ValueError as e:
-        print(e)
-        print(line)
-        return None
-
-
-def bz2_to_parquet(input_filepath, id_):
+    Note:
+        - This function reads the input BZ2 file, filters the data, and converts it to Parquet format.
+        - The data is filtered using the `process_data_line` function.
+        - The resulting Parquet file will have the following schema:
+          - 'wikicode': string
+          - 'article_title': string
+          - 'daily_total': int64
+          - 'hourly_counts': string
+        - The output Parquet file will be named '<id>.parquet', where <id> is the provided identifier.
+        - The progress and position in the uncompressed file will be logged every 10 seconds.
+        - The conversion time will be logged upon completion.
+    """
     chunk_size = 100000
     output_file = f"{id_}.parquet"
 
@@ -199,12 +136,34 @@ def bz2_to_parquet(input_filepath, id_):
     if parquet_writer is not None:
         parquet_writer.close()
 
-    return output_file
-
     console.log(f"Conversion time for {id_}: {round(time.time() - start_time, 2)} seconds")
 
+    return output_file
 
-def get_env_vars(environ):
+
+def get_env_vars(environ: dict) -> tuple:
+    """
+    Retrieves environment variables related to a bucket.
+
+    Args:
+        environ (dict): The environment variables dictionary.
+
+    Returns:
+        tuple: A tuple containing the following bucket-related information:
+               - endpoint: The bucket endpoint.
+               - bucket_id: The bucket ID.
+               - access_key: The access key ID for the bucket.
+               - secret_key: The secret access key for the bucket.
+               - region: The region associated with the bucket.
+
+    Note:
+        The function retrieves the values of the following environment variables:
+        - BUCKET_ENDPOINT: The endpoint for the bucket.
+        - BUCKET_ID: The ID of the bucket.
+        - BUCKET_ACCESS_KEY_ID: The access key ID for the bucket.
+        - BUCKET_SECRET_KEY: The secret access key for the bucket.
+        - BUCKET_REGION: The region associated with the bucket.
+    """
     endpoint = environ.get("BUCKET_ENDPOINT")
     bucket_id = environ.get("BUCKET_ID")
     access_key = environ.get("BUCKET_ACCESS_KEY_ID")

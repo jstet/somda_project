@@ -1,6 +1,6 @@
-from somda_project.pipelines import get_upload_parquet, get_timeseries_day, concat_csvs
+from somda_project.pipelines import get_upload_parquet, get_timeseries_day, concat_csvs, get_election_data
 from somda_project.helpers import gen_urls, get_env_vars
-from somda_project.s3_funcs import create_minio_client, retrieve_file
+from somda_project.IO_handlers import create_minio_client, retrieve_file
 from dotenv import load_dotenv
 import modal
 import os
@@ -33,24 +33,28 @@ def f3(urls):
     return concat_csvs(urls, client, bucket_id)
 
 
-@stub.function(image=image, timeout=1000)
+@stub.function(image=image, timeout=1000, secret=modal.Secret.from_dotenv(__file__))
 def f4():
+    endpoint, bucket_id, access_key, secret_key, region = get_env_vars(os.environ)
+    client = create_minio_client(endpoint, access_key, secret_key, region)
+    return get_election_data(client, bucket_id)
+
+
+@stub.function(image=image, timeout=1000)
+def f5():
     return gen_urls()
 
 
 @stub.local_entrypoint()
 def main():
     endpoint, bucket_id, access_key, secret_key, region = get_env_vars(os.environ)
-    print(endpoint)
     client = create_minio_client(endpoint, access_key, secret_key, region)
-    # urls = f4.call()
+    # urls = f5.call()
     # list(f1.map(urls))
     # list(f2.map(urls))
-    # f3.call(urls)
-    csv = retrieve_file(client, "merged_election_pages.csv", bucket_id)
-    print(csv, type(csv))
-    if os.path.exists(csv):
-        os.replace(f"./{csv}", f"./data/{csv}")
-        print("File moved successfully.")
-    else:
-        print("File does not exist.")
+    # merged = f3.call(urls)
+    # csv = retrieve_file(client, merged, bucket_id)
+    # os.replace(f"./{csv}", f"./data/{csv}")
+    election_data = f4.call()
+    csv = retrieve_file(client, election_data, bucket_id)
+    os.replace(f"./{csv}", f"./data/{csv}")
