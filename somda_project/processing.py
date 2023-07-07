@@ -8,6 +8,15 @@ import copy
 from somda_project.console import console
 
 
+def get_party_results(df, nested_dct):
+    nested_dct_copy = copy.deepcopy(nested_dct)
+    for key, val in nested_dct_copy.items():
+        result = df[df["PARTY_ID"] == key]["VOTES_PERCENT"].values
+        if len(result) != 0:
+            val["result"] = result[0]
+    return nested_dct_copy
+
+
 def get_parties(df, eu_elections, year):
     eu_elections_copy = copy.deepcopy(eu_elections)
     for key, val in eu_elections_copy.items():

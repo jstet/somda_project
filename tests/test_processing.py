@@ -4,6 +4,7 @@ from somda_project.processing import (
     explode_timeseries,
     get_turnout,
     get_parties,
+    get_party_results,
     process_data_line,
     decipher_hours,
 )
@@ -11,6 +12,7 @@ from somda_project.data import eu_elections
 from somda_project.IO_handlers import download_file
 import importlib_resources
 import os
+import json
 import pandas as pd
 from dotenv import load_dotenv
 
@@ -150,8 +152,8 @@ def test_get_turnout():
     output_filepath, id_ = download_file({"url": turnout_url, "id": "turnout"}, "csv")
     turnout = pd.read_csv(output_filepath, delimiter=";")
     os.remove(output_filepath)
-    eu_elections_proc = get_turnout(turnout, eu_elections)
-    print(eu_elections_proc)
+    temp = get_turnout(turnout, eu_elections)
+    assert isinstance(temp, dict)
 
 
 def test_get_parties():
@@ -161,8 +163,8 @@ def test_get_parties():
     output_filepath, id_ = download_file({"url": parties_2014_url, "id": "parties_2014"}, "csv")
     parties = pd.read_csv(output_filepath, delimiter=";")
     os.remove(output_filepath)
-    eu_elections_proc = get_parties(parties, eu_elections, 2014)
-    print(eu_elections_proc, "\n")
+    temp = get_parties(parties, eu_elections, 2014)
+    assert isinstance(temp, dict)
 
     parties_2019_url = (
         "https://www.europarl.europa.eu/election-results-2019/data-sheets/csv/2019-2024/election-results/parties.csv"
@@ -170,5 +172,21 @@ def test_get_parties():
     output_filepath, id_ = download_file({"url": parties_2019_url, "id": "parties_2019"}, "csv")
     parties = pd.read_csv(output_filepath, delimiter=";")
     os.remove(output_filepath)
-    eu_elections_proc = get_parties(parties, eu_elections, 2019)
-    print(eu_elections_proc)
+    temp = get_parties(parties, eu_elections, 2019)
+    assert isinstance(temp, dict)
+
+
+def test_get_party_results():
+    resource_path = importlib_resources.files("tests.data.election_data").joinpath("election_data.json")
+    path = str(resource_path)  # Convert the Path object to a string
+    with open(path) as file:
+        json_content = file.read()
+    eu_elections = json.loads(json_content)
+    year = 2014
+    key = "DE"
+    url = f"https://www.europarl.europa.eu/election-results-2019/data-sheets/csv/{year}-{year+5}/election-results/results-parties/results-parties-{key.lower()}.csv"
+    output_filepath, id_ = download_file({"url": url, "id": f"{key}_results_{year}"}, "csv")
+    df = pd.read_csv(output_filepath, delimiter=";")
+    os.remove(output_filepath)
+    temp = get_party_results(df, eu_elections[key][str(year)]["parties"])
+    assert isinstance(temp, dict)
