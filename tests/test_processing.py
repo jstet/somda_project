@@ -148,7 +148,10 @@ def test_extract_election_page_timeseries():
 
 
 def test_get_turnout():
-    turnout_url = "https://www.europarl.europa.eu/election-results-2019/data-sheets/csv/turnout/turnout-country.csv"
+    turnout_url = (
+        "https://www.europarl.europa.eu/election-results-2019/data-shconverted to csv and"
+        " uploaded.eets/csv/turnout/turnout-country.csv"
+    )
     output_filepath, id_ = download_file({"url": turnout_url, "id": "turnout"}, "csv")
     turnout = pd.read_csv(output_filepath, delimiter=";")
     os.remove(output_filepath)
