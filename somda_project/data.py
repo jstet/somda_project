@@ -1,15 +1,9 @@
 eu_elections = {
-    "BE": {
-        "language": "dutch",
-        "wikicode": "nl.wikipedia",
-        2014: {"article_name": "Europese_Parlementsverkiezingen_2014"},
-        2019: {"article_name": "Europese_Parlementsverkiezingen_2019"},
-    },
-    "BG": {
-        "language": "bulgarian",
-        "wikicode": "bg.wikipedia",
-        2014: {"article_name": "Избори_за_Европейския_парламент_(2014)"},
-        2019: {"article_name": None},
+    "CS": {
+        "language": "czech",
+        "wikicode": "cs.wikipedia",
+        2014: {"article_name": "Volby_do_Evropského_parlamentu_2014"},
+        2019: {"article_name": "Volby_do_Evropského_parlamentu_2019"},
     },
     "DK": {
         "language": "danish",
@@ -23,11 +17,71 @@ eu_elections = {
         2014: {"article_name": "Europawahl_2014"},
         2019: {"article_name": "Europawahl_2019"},
     },
+    "EL": {
+        "language": "greek",
+        "wikicode": "el.wikipedia",
+        2014: {"article_name": "Ευρωεκλογές_2014"},
+        2019: {"article_name": "Ευρωεκλογές_2019"},
+    },
+    "FI": {
+        "language": "finish",
+        "wikicode": "fi.wikipedia",
+        2014: {"article_name": "Europarlamenttivaalit_2014"},
+        2019: {"article_name": "Europarlamenttivaalit_2019"},
+    },
     "FR": {
         "language": "french",
         "wikicode": "fr.wikipedia",
         2014: {"article_name": "Élections_européennes_de_2014"},
         2019: {"article_name": "Élections_européennes_de_2019"},
+    },
+    "HU": {
+        "language": "hungarian",
+        "wikicode": "hu.wikipedia.",
+        2014: {"article_name": "2014-es_magyarországi_országgyűlési_választás"},
+        2019: {"article_name": "2019-es_európai_parlamenti_választás"},
+    },
+    "IT": {
+        "language": "italian",
+        "wikicode": "it.wikipedia",
+        2014: {"article_name": "Elezioni_europee_del_2014"},
+        2019: {"article_name": "Elezioni_europee_del_2019"},
+    },
+    "NL": {
+        "language": "dutch",
+        "wikicode": "nl.wikipedia",
+        2014: {"article_name": "Europese_Parlementsverkiezingen_2014"},
+        2019: {"article_name": "Europese_Parlementsverkiezingen_2019"},
+    },
+    "PL": {
+        "language": "polish",
+        "wikicode": "pl.wikipedia",
+        2014: {"article_name": "Wybory_do_Parlamentu_Europejskiego_w_2014_roku"},
+        2019: {"article_name": "Wybory_do_Parlamentu_Europejskiego_w_2019_roku"},
+    },
+    "GB": {
+        "language": "english",
+        "wikicode": "en.wikipedia",
+        2014: {"article_name": "2014_European_Parliament_election"},
+        2019: {"article_name": "2019_European_Parliament_election"},
+    },
+    "SV": {
+        "language": "swedish",
+        "wikicode": "sv.wikipedia",
+        2014: {"article_name": "Europaparlamentsvalet_2014"},
+        2019: {"article_name": "Europaparlamentsvalet_2019"},
+    },
+    "ES": {
+        "language": "spanish",
+        "wikicode": "es.wikipedia",
+        2014: {"article_name": "Elecciones_al_Parlamento_Europeo_de_2014"},
+        2019: {"article_name": "Elecciones_al_Parlamento_Europeo_de_2019"},
+    },
+    "SL": {
+        "language": "spanish",
+        "wikicode": "sl.wikipedia",
+        2014: {"article_name": "Volitve_v_Evropski_parlament_2014"},
+        2019: {"article_name": "Volitve_v_Evropski_parlament_2019"},
     },
 }
 
