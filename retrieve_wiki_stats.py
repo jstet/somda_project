@@ -43,7 +43,7 @@ def main():
     endpoint, bucket_id, access_key, secret_key, region = get_env_vars(os.environ)
     client = create_minio_client(endpoint, access_key, secret_key, region)
     urls = f4.call()
-    # list(f1.map(urls))
+    list(f1.map(urls))
     list(f2.map(urls))
     merged = f3.call(urls)
     csv = retrieve_file(client, merged, bucket_id)

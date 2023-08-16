@@ -107,7 +107,25 @@ def test_extract_page():
         "A38B25C18D32E84F281G807H809I1056J939K884L789M722N673O687P557Q585R594S635T633U739V347W179X70",
     )
     temp = extract_page(path, "bg.wikipedia", "Избори_за_Европейския_парламент_(2014)")
-    print(temp)
+    assert temp == ()
+    # English Wikipedia idiosyncrasies
+    temp = extract_page(path, "en.wikipedia", "2014_European_Parliament_election")
+    assert temp == (
+        "en.wikipedia",
+        "European_Parliament_election,_2014_(United_Kingdom)",
+        8101,
+        "A106B82C63D56E46F91G155H249I357J409K492L547M611N465O445P461Q470R536S492T561U425V453W341X188",
+    )
+    resource_path = importlib_resources.files("tests.data.pageviews_parquet").joinpath("2014_05_16.parquet")
+    path = str(resource_path)
+    temp = extract_page(path, "en.wikipedia", "European_Parliament_election", "2014")
+    assert temp == (
+        "en.wikipedia",
+        "European_Parliament_election,_2014_(United_Kingdom)",
+        4465,
+        "A78B60C60D37E42F64G97H152I252J277K264L293M239N297O244P256Q255R242S216T202U241V265W179X153",
+    )
+    # English Wikipedia idiosyncrasies
 
 
 def test_explode_timeseries():

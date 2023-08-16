@@ -6,7 +6,16 @@ from somda_project.data import eu_elections
 import pandas as pd
 from typing import Any
 import json
+from datetime import date, datetime
 import os
+
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    raise TypeError("Type %s not serializable" % type(obj))
 
 
 def get_election_data(minio_client: Any, bucket_id: str) -> str:
@@ -51,7 +60,7 @@ def get_election_data(minio_client: Any, bucket_id: str) -> str:
 
     json_path = "eu_elections.json"
     with open(json_path, "w") as outfile:
-        json.dump(eu_elections_proc, outfile)
+        json.dump(eu_elections_proc, outfile, default=json_serial)
 
     s3_path = upload_file(minio_client, json_path, json_path, bucket_id)
 

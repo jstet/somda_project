@@ -1,4 +1,5 @@
-from somda_project.helpers import download_file, bz2_to_parquet, gen_urls
+from somda_project.helpers import bz2_to_parquet, gen_urls
+from somda_project.IO_handlers import download_file
 import importlib_resources
 import requests
 import os

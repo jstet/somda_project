@@ -49,13 +49,15 @@ def get_turnout(df: pd.DataFrame, eu_elections: dict) -> dict:
     eu_elections_copy = copy.deepcopy(eu_elections)
 
     for key, val in eu_elections_copy.items():
-        val[2019]["turnout"] = df[(df["YEAR"] == 2019) & (df["COUNTRY_ID"] == key)]["RATE"].values[0]
-        val[2014]["turnout"] = df[(df["YEAR"] == 2014) & (df["COUNTRY_ID"] == key)]["RATE"].values[0]
+        print(key, val)
+        print(df["COUNTRY_ID"].unique())
+        val[2019]["turnout"] = df.loc[(df["YEAR"] == 2019) & (df["COUNTRY_ID"] == key), "RATE"].values[0]
+        val[2014]["turnout"] = df.loc[(df["YEAR"] == 2014) & (df["COUNTRY_ID"] == key), "RATE"].values[0]
 
     return eu_elections_copy
 
 
-def extract_page(input_filepath: str, wikicode: str, page_name: str) -> tuple:
+def extract_page(input_filepath: str, wikicode: str, page_name: str, sec_search_term: str = None) -> tuple:
     """
     Extracts a specific page from the input file.
 
@@ -75,7 +77,8 @@ def extract_page(input_filepath: str, wikicode: str, page_name: str) -> tuple:
     temp = duckdb.query(f"""
     SELECT *
     FROM '{input_filepath}'
-    WHERE article_title LIKE '{page_name}' AND wikicode = '{wikicode}'
+    WHERE article_title LIKE '{page_name}'
+    AND wikicode = '{wikicode}'
     """).fetchall()
     if temp:
         # return page with highest daily views

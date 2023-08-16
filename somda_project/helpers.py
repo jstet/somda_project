@@ -1,4 +1,3 @@
-import calendar
 from somda_project.console import console
 from somda_project.processing import process_data_line
 import time
@@ -6,6 +5,7 @@ from contextlib import ExitStack
 import pyarrow as pa
 import pyarrow.parquet as pq
 from typing import List, Dict
+from datetime import datetime, timedelta
 import bz2
 
 
@@ -24,38 +24,27 @@ def gen_urls() -> List[Dict[str, object]]:
         {"name": "Europawahl 2014", "start_date": (2014, 5, 22), "end_date": (2014, 5, 25)},
         {"name": "Europawahl 2019", "start_date": (2019, 5, 23), "end_date": (2019, 5, 26)},
     ]
-    num_days_before = 7  # Number of days before the election to include
-    num_days_after = 7  # Number of days after the election to include
+    num_days_before = 14  # Number of days before the election to include
+    num_days_after = 14  # Number of days after the election to include
 
     urls = []
 
     for election in elections:
-        start_date = (
-            election["start_date"][0],
-            election["start_date"][1],
-            election["start_date"][2] - num_days_before,
-        )
-        end_date = (
-            election["end_date"][0],
-            election["end_date"][1],
-            election["end_date"][2] + num_days_after,
-        )
+        start_date = datetime(*election["start_date"])
+        end_date = datetime(*election["end_date"])
 
-        for year in range(start_date[0], end_date[0] + 1):
-            for month in range(1, 13):
-                if (year == start_date[0] and month < start_date[1]) or (year == end_date[0] and month > end_date[1]):
-                    continue
+        # Adjust start and end dates by the specified number of days
+        start_date -= timedelta(days=num_days_before)
+        end_date += timedelta(days=num_days_after)
 
-                num_days = calendar.monthrange(year, month)[1]
-
-                for day in range(1, num_days + 1):
-                    date = (year, month, day)
-
-                    if start_date <= date <= end_date:
-                        url = f"{base_url}{year}/{year}-{month:02d}/pageviews-{year}{month:02d}{day:02d}-user.bz2"
-                        urls.append(
-                            {"url": url, "id": f"{year}_{month:02d}_{day:02d}", "year": election["start_date"][0]}
-                        )
+        current_date = start_date
+        while current_date <= end_date:
+            year = current_date.year
+            month = current_date.month
+            day = current_date.day
+            url = f"{base_url}{year}/{year}-{month:02d}/pageviews-{year}{month:02d}{day:02d}-user.bz2"
+            urls.append({"url": url, "id": f"{year}_{month:02d}_{day:02d}", "year": election["start_date"][0]})
+            current_date += timedelta(days=1)
 
     return urls
 
