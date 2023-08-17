@@ -77,7 +77,7 @@ def extract_page(input_filepath: str, wikicode: str, page_name: str, sec_search_
     temp = duckdb.query(f"""
     SELECT *
     FROM '{input_filepath}'
-    WHERE article_title LIKE '{page_name}'
+    WHERE  article_title = '{page_name}'
     AND wikicode = '{wikicode}'
     """).fetchall()
     if temp:
