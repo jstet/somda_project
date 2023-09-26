@@ -18,6 +18,14 @@ This python project is managed using poetry. It mainly consists of
 ## Dev Setup
 1. Install Requirements (also requirements in the dev group) using [Poetry](https://python-poetry.org/)
 2. Initialize [Modal](https://modal.com/)
+3. Create a .env file with following content:
+```
+BUCKET_ENDPOINT=endpoint
+BUCKET_ID=id
+BUCKET_REGION=region
+BUCKET_ACCESS_KEY_ID=key_id
+BUCKET_SECRET_KEY=secret
+```
 
 ### Data Retrieval
 Having installed the requirements and initialized modal, you can run the retrieval_*.py files. 
