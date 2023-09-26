@@ -1,0 +1,197 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                       %
+% Vorlage fuer die Erstellung von PDF-Dokumenten        %
+% im Corporate Design der Universität Konstanz          %
+% Stand: 14.09.2016 - Michael Brendle (Version 0.4)     %
+%                                                       %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Dokumentenklasse scrreprt                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[12pt, rgb, english, parskip=full, oneside, ]{scrreprt}
+
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\chapter}{\if@openright\cleardoublepage\else\clearpage\fi}{}{}{}
+\makeatother
+
+\usepackage{setspace}
+\setstretch{1.05}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Paket Theme Konstanz         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{themeKonstanzXelatexAddOn} % XeLaTeX mit Schriftart Arial, VOR dem Standardpaket importieren
+\usepackage{themeKonstanz} % Muss immer verwendet werden (Standardpaket)
+\usepackage{themeKonstanzStyleAddOn} % Style Add-On für andere Überschriften, NACH dem Standardpaket importieren
+
+
+
+% preventing widow/orphan lines
+\widowpenalty10000
+\clubpenalty10000
+
+% underline with dotted line
+\newcommand{\uloosdash}[1]{%
+    \tikz[baseline=(todotted.base)]{
+        \node[inner sep=1.5pt,outer sep=0pt] (todotted) {#1};
+        \draw[loosely dashed] (todotted.south west) -- (todotted.south east);
+    }%
+}%
+
+% underline with dashed line
+\newcommand{\uldotted}[1]{%
+    \tikz[baseline=(todotted.base)]{
+        \node[inner sep=1.5pt,outer sep=0pt] (todotted) {#1};
+        \draw[dotted] (todotted.south west) -- (todotted.south east);
+    }%
+}%
+
+% create circle box with text
+% #1 size -- #2 draw color -- #3 fill color -- #4 text color -- #5 text
+\newcommand{\circlebox}[5]{\resizebox{#1}{!}{\tikz \node[draw=#2, fill=#3, circle, scale=1, text=#4, inner sep=0.5mm, font=\bfseries] at (0,0) {#5};}}
+
+% create rectangle box with text
+% #1 size -- #2 draw color -- #3 fill color -- #4 text color -- #5 text
+\newcommand{\rectanglebox}[5]{\resizebox{#1}{!}{\tikz \node[draw=#2, fill=#3, rectangle, scale=1, text=#4, inner sep=1mm, font=\bfseries] at (0,0) {#5};}}
+
+\newcommand{\dquote}[1]{``#1''}
+\newcommand{\squote}[1]{`#1'}
+\newcommand{\etc}{etc}
+\newcommand{\ie}{i.e.}
+\newcommand{\eg}{e.g.}
+\newcommand{\cf}{cf.}
+\newcommand{\etal}{et al.}
+
+% Additional colors
+\definecolor{mdgreen}{RGB}{0, 204, 0}
+\definecolor{ltblue}{RGB}{153, 204, 255}
+\definecolor{dkblue}{RGB}{0, 143, 204}
+\definecolor{dkgrey}{RGB}{128, 128, 128}
+\definecolor{ltgrey}{RGB}{160, 160, 160}
+
+\definecolor{yellow}{RGB}{255, 255, 0}
+\definecolor{red}{RGB}{255, 50, 50}
+
+\newcommand{\todo}[1]{\noindent \textcolor{red}{TODO: #1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Dokumentinformationen        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\date{20.08.2023}
+\year{2023}
+\author{Jonas Stettner (01/1152625)}
+\title{Replication Study: Wikipedia traffic data and electoral prediction}
+\subtitle{}
+\unisection{Social Media Data Analysis }
+\department{Department of Politics and Public Administration}
+\supervisorOne{Prof. David Garcia}
+
+
+
+\headFoot{14}
+
+%%%% Default for rm family
+%\renewcommand\familydefault{\rmdefault}
+% \setmathfont{OT1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Begin vom Dokument                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Thesis-Titelseite            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\thesistitlepage[language=english]{Project Report}
+
+\rmfamily % Auskommentieren für eine Schrift mit serifen / Kommentieren für eine serifenlose Schrift
+\normalsize
+
+\newpage
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Inhaltsverzeichnis           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Das Inhaltsverzeichnis kann wie gewohnt mit dem Makro
+%
+%    \tableofcontents
+%
+% erstellt werden.
+
+\tableofcontents
+
+\newpage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Abbildungsverzeichnis        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \listoffigures
+% \addcontentsline{toc}{chapter}{Abbildungsverzeichnis}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Tabellenverzeichnis          %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \listoftables
+% \addcontentsline{toc}{chapter}{Tabellenverzeichnis}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Kapitel, Abschnitte, ...     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagenumbering{arabic}
+
+\input{inc/02_motivation.tex}
+\input{inc/03_background.tex}
+\input{inc/04_data.tex}
+\input{inc/05_methods.tex}
+\input{inc/06_results.tex}
+\input{inc/07_discussion.tex}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Literaturverzeichnis         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Zum Schluss kann noch das Literaturvzerzeichnis hinzugefügt
+% werden.
+%
+% Damit es ebenfalls im Inhaltsverzeichnis gefunden werden kann,
+% sollte das Literaturverzeichnis mit dem Makro
+%
+%    \addcontentsline{toc}{chapter}{Literaturverzeichnis}
+%
+% hinzugefügt werden.
+
+
+
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyle{apalike}
+\bibliography{main.bib}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Ende vom Dokument                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

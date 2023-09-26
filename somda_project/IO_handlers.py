@@ -66,19 +66,31 @@ def download_file(url: dict, filetype: str = "bz2") -> Tuple[str, str]:
         Tuple[str, str]: A tuple containing the file path and the identifier of the downloaded file.
     """
     console.log(f"Starting download for {url['id']}")
-    with requests.get(url["url"], stream=True) as raw:
-        total_length = int(raw.headers.get("Content-Length"))
-        filepath = f"temp_{os.path.basename(url['id'])}.{filetype}"
-        with open(filepath, "wb") as output:
-            start_time = time.time()
-            update_time = start_time + 10
-            for chunk in raw:
-                output.write(chunk)
-                if time.time() >= update_time:
-                    elapsed_time = time.time() - start_time
-                    downloaded = output.tell()
-                    speed = downloaded / elapsed_time
-                    progress = min(downloaded / total_length, 1.0) * 100
-                    console.log(f"ID: {url['id']} Progress: {progress:.2f}%, Speed: {speed:.2f} B/s")
-                    update_time += 10
-    return filepath, url["id"]
+    retry_count = 0
+    max_retries = 4
+    retry_delay = 10  # seconds
+    while retry_count < max_retries:
+        with requests.get(url["url"], stream=True) as raw:
+            if raw.status_code == 200:
+                total_length = int(raw.headers.get("Content-Length"))
+                filepath = f"temp_{os.path.basename(url['id'])}.{filetype}"
+                with open(filepath, "wb") as output:
+                    start_time = time.time()
+                    update_time = start_time + 10
+                    for chunk in raw:
+                        output.write(chunk)
+                        if time.time() >= update_time:
+                            elapsed_time = time.time() - start_time
+                            downloaded = output.tell()
+                            speed = downloaded / elapsed_time
+                            progress = min(downloaded / total_length, 1.0) * 100
+                            console.log(f"ID: {url['id']} Progress: {progress:.2f}%, Speed: {speed:.2f} B/s")
+                            update_time += 10
+                return filepath, url["id"]
+            elif raw.status_code == 503:
+                console.log(f"Received status code 503. Retrying after {retry_delay} seconds...")
+                time.sleep(retry_delay)
+                retry_count += 1
+            else:
+                raise Exception(f"Failed to download file for {url['url']}, Status code: {raw.status_code}")
+    raise Exception(f"Failed to download file for {url['url']} after {max_retries} retries")

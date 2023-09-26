@@ -8,27 +8,27 @@ import copy
 from somda_project.console import console
 
 
-def get_party_results(df, nested_dct):
-    nested_dct_copy = copy.deepcopy(nested_dct)
-    for key, val in nested_dct_copy.items():
-        result = df[df["PARTY_ID"] == key]["VOTES_PERCENT"].values
-        if len(result) != 0:
-            val["result"] = result[0]
-    return nested_dct_copy
+# def get_party_results(df, nested_dct):
+#     nested_dct_copy = copy.deepcopy(nested_dct)
+#     for key, val in nested_dct_copy.items():
+#         result = df[df["PARTY_ID"] == key]["VOTES_PERCENT"].values
+#         if len(result) != 0:
+#             val["result"] = result[0]
+#     return nested_dct_copy
 
 
-def get_parties(df, eu_elections, year):
-    eu_elections_copy = copy.deepcopy(eu_elections)
-    for key, val in eu_elections_copy.items():
-        temp = df[df["DIVISION_ID"] == key]
-        party_dict = {}
-        for _, row in temp.iterrows():
-            party_id = row["ID"]
-            party_label = row["LABEL"]
-            party_dict[party_id] = {"label": party_label}
-        val[year]["parties"] = party_dict
+# def get_parties(df, eu_elections, year):
+#     eu_elections_copy = copy.deepcopy(eu_elections)
+#     for key, val in eu_elections_copy.items():
+#         temp = df[df["DIVISION_ID"] == key]
+#         party_dict = {}
+#         for _, row in temp.iterrows():
+#             party_id = row["ID"]
+#             party_label = row["LABEL"]
+#             party_dict[party_id] = {"label": party_label}
+#         val[year]["parties"] = party_dict
 
-    return eu_elections_copy
+#     return eu_elections_copy
 
 
 def get_turnout(df: pd.DataFrame, eu_elections: dict) -> dict:
@@ -77,8 +77,8 @@ def extract_page(input_filepath: str, wikicode: str, page_name: str, sec_search_
     temp = duckdb.query(f"""
     SELECT *
     FROM '{input_filepath}'
-    WHERE  article_title = '{page_name}'
-    AND wikicode = '{wikicode}'
+    WHERE  contains(article_title, '{page_name}') AND wikicode = '{wikicode}'
+   
     """).fetchall()
     if temp:
         # return page with highest daily views
@@ -88,7 +88,7 @@ def extract_page(input_filepath: str, wikicode: str, page_name: str, sec_search_
         return tuple()
 
 
-def explode_timeseries(df: pd.DataFrame) -> pd.DataFrame:
+def explode_timeseries(df: pd.DataFrame, year) -> pd.DataFrame:
     """
     Explodes the hourly views timeseries in the DataFrame.
 
@@ -105,13 +105,18 @@ def explode_timeseries(df: pd.DataFrame) -> pd.DataFrame:
           and timestamp (calculated from date and hour).
         - The original "date" and "hour" columns are dropped from the DataFrame.
     """
-    df = df.join(pd.json_normalize(df["hourly_views"]))
-    df = df.drop("hourly_views", axis=1)
+    if year != 2009:
+        df = df.join(pd.json_normalize(df["hourly_views"]))
+        df = df.drop("hourly_views", axis=1)
 
-    df = df.melt(id_vars=["date", "wikicode"], var_name="hour", value_name="hourly_views")
-
-    df["timestamp"] = pd.to_datetime(df["date"], format="%Y_%m_%d") + pd.to_timedelta(df["hour"].astype(int), unit="h")
-    df = df.drop(["date", "hour"], axis=1)
+        df = df.melt(id_vars=["date", "wikicode"], var_name="hour", value_name="hourly_views")
+        df["timestamp"] = pd.to_datetime(df["date"], format="%Y_%m_%d") + pd.to_timedelta(
+            df["hour"].astype(int), unit="h"
+        )
+        df = df.drop(["date", "hour"], axis=1)
+    else:
+        df["timestamp"] = pd.to_datetime(df["date"], format="%Y_%m_%d_%H")
+        df = df.drop(["date"], axis=1)
     return df
 
 
@@ -139,22 +144,31 @@ def extract_election_page_timeseries(input_filepath: str, id_: str, year: int, e
     """
     election_page_lst = []
     for key, value in eu_elections.items():
-        election_page = list(extract_page(input_filepath, value["wikicode"], value[year]["article_name"]))
-        if election_page:
-            row = [id_, value["wikicode"], decipher_hours(election_page[3])]
+        if year == 2009:
+            election_page = list(
+                extract_page(input_filepath, value["wikicode"].replace(".wikipedia", ""), value[year]["article_name"])
+            )
         else:
-            row = [id_, value["wikicode"], {}]
-        election_page_lst.append(row)
+            election_page = list(extract_page(input_filepath, value["wikicode"], value[year]["article_name"]))
+        if election_page:
+            if year == 2009:
+                row = [id_, value["wikicode"], election_page[2]]
+            else:
+                row = [id_, value["wikicode"], decipher_hours(election_page[2])]
+            election_page_lst.append(row)
+        else:
+            console.log(f"Could not find page: {value[year]['article_name']} for in {value['wikicode']}")
 
     df = pd.DataFrame(election_page_lst, columns=["date", "wikicode", "hourly_views"])
-    df = explode_timeseries(df)
+
+    df = explode_timeseries(df, year)
     df["hourly_views"] = df["hourly_views"].astype("Int64")
     output = f"{id_}.csv"
     df.to_csv(output, index=False)
     return output
 
 
-def process_data_line(line: str) -> Optional[dict]:
+def process_data_line(line: str, year: int) -> Optional[dict]:
     """
     Processes a line of data and extracts relevant information.
 
@@ -176,23 +190,31 @@ def process_data_line(line: str) -> Optional[dict]:
         - Constructs a dictionary with the extracted information.
         - Filters the dictionary to keep only data related to Wikipedia articles.
     """
+
     try:
         parts = line.strip().split(" ")
         wikicode = urllib.parse.unquote(parts[0])
         article_title = urllib.parse.unquote(parts[1])
-        daily_total = int(parts[-2])
-        hourly_counts = parts[-1]
+        if year == 2009:
+            hourly_counts = parts[2]
+        else:
+            hourly_counts = parts[-1]
         dct = {
             "wikicode": wikicode,
             "article_title": article_title,
-            "daily_total": daily_total,
             "hourly_counts": hourly_counts,
         }
-        # keep only stuff from wikipedia project and only articles (they don't start with a namespace)
-        if "wikipedia" in dct["wikicode"] and not re.match(r"^\w+:", dct["article_title"]):
-            return dct
+
+        if year != 2009:
+            # keep only stuff from wikipedia project and only articles (they don't start with a namespace)
+            if "wikipedia" in dct["wikicode"] and not re.match(r"^\w+:", dct["article_title"]):
+                return dct
+        else:
+            if "." not in dct["wikicode"] and not re.match(r"^\w+:", dct["article_title"]):
+                return dct
     # sometimes its a line like: "de.wikipedia Versuchstelle_Gottow"
     except ValueError as e:
+        print(e)
         console.log(e)
         console.log(line)
         return None

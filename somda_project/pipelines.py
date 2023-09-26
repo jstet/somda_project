@@ -1,6 +1,6 @@
-from somda_project.helpers import bz2_to_parquet
+from somda_project.helpers import compr_to_parquet
 from somda_project.IO_handlers import upload_file, check_object_exists, retrieve_file, download_file
-from somda_project.processing import extract_election_page_timeseries, get_turnout, get_parties, get_party_results
+from somda_project.processing import extract_election_page_timeseries, get_turnout
 from somda_project.console import console
 from somda_project.data import eu_elections
 import pandas as pd
@@ -45,18 +45,18 @@ def get_election_data(minio_client: Any, bucket_id: str) -> str:
     turnout = pd.read_csv(output_filepath, delimiter=";")
     os.remove(output_filepath)
     eu_elections_proc = get_turnout(turnout, eu_elections)
-    for year in [2014, 2019]:
-        url = f"https://www.europarl.europa.eu/election-results-2019/data-sheets/csv/{year}-{year+5}/election-results/parties.csv"
-        output_filepath, id_ = download_file({"url": url, "id": f"parties_{year}"}, "csv")
-        df = pd.read_csv(output_filepath, delimiter=";")
-        os.remove(output_filepath)
-        eu_elections_proc = get_parties(df, eu_elections_proc, year)
-        for key, value in eu_elections_proc.items():
-            url = f"https://www.europarl.europa.eu/election-results-2019/data-sheets/csv/{year}-{year+5}/election-results/results-parties/results-parties-{key.lower()}.csv"
-            output_filepath, id_ = download_file({"url": url, "id": f"{key}_results_{year}"}, "csv")
-            df = pd.read_csv(output_filepath, delimiter=";")
-            os.remove(output_filepath)
-            eu_elections_proc[key][year]["parties"] = get_party_results(df, eu_elections_proc[key][year]["parties"])
+    # for year in [2014, 2019]:
+    #     url = f"https://www.europarl.europa.eu/election-results-2019/data-sheets/csv/{year}-{year+5}/election-results/parties.csv"
+    #     output_filepath, id_ = download_file({"url": url, "id": f"parties_{year}"}, "csv")
+    #     df = pd.read_csv(output_filepath, delimiter=";")
+    #     os.remove(output_filepath)
+    # eu_elections_proc = get_parties(df, eu_elections_proc, year)
+    # for key, value in eu_elections_proc.items():
+    #     url = f"https://www.europarl.europa.eu/election-results-2019/data-sheets/csv/{year}-{year+5}/election-results/results-parties/results-parties-{key.lower()}.csv"
+    #     output_filepath, id_ = download_file({"url": url, "id": f"{key}_results_{year}"}, "csv")
+    #     df = pd.read_csv(output_filepath, delimiter=";")
+    #     os.remove(output_filepath)
+    #     eu_elections_proc[key][year]["parties"] = get_party_results(df, eu_elections_proc[key][year]["parties"])
 
     json_path = "eu_elections.json"
     with open(json_path, "w") as outfile:
@@ -84,14 +84,17 @@ def get_upload_parquet(url: dict, minio_client: Any, bucket_id: str) -> str:
     Note:
         - This function checks if the Parquet file already exists in the bucket.
         - If the file doesn't exist, it downloads the file from the URL using the download_file function.
-        - The downloaded file is converted to the Parquet format using the bz2_to_parquet function.
+        - The downloaded file is converted to the Parquet format using the compr_to_parquet function.
         - The original and converted files are deleted after processing.
         - The Parquet file is uploaded to the S3 server using the upload_file function.
     """
     if not check_object_exists(minio_client, f"{url['id']}.parquet", bucket_id):
-        bz2_path, id_ = download_file(url)
-        output_filepath = bz2_to_parquet(bz2_path, id_)
-        os.remove(bz2_path)
+        if url["year"] == 2009:
+            compr_path, id_ = download_file(url, "gz")
+        else:
+            compr_path, id_ = download_file(url)
+        output_filepath = compr_to_parquet(compr_path, id_, url["year"])
+        os.remove(compr_path)
         s3_path = upload_file(minio_client, f"{id_}.parquet", output_filepath, bucket_id)
         os.remove(output_filepath)
         return s3_path

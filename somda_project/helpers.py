@@ -1,12 +1,15 @@
 from somda_project.console import console
 from somda_project.processing import process_data_line
+import requests
 import time
 from contextlib import ExitStack
 import pyarrow as pa
 import pyarrow.parquet as pq
 from typing import List, Dict
 from datetime import datetime, timedelta
-import bz2
+import bz2  # noqa: F401
+import gzip  # noqa: F401
+from bs4 import BeautifulSoup
 
 
 def gen_urls() -> List[Dict[str, object]]:
@@ -19,13 +22,35 @@ def gen_urls() -> List[Dict[str, object]]:
         - 'id': The identifier for the specific date of the pageview data (in the format 'YYYY_MM_DD').
         - 'year': The year of the election associated with the pageview data.
     """
-    base_url = "https://dumps.wikimedia.org/other/pageview_complete/"
     elections = [
+        {"name": "Europawahl 2009", "start_date": (2009, 6, 4), "end_date": (2009, 6, 7)},
         {"name": "Europawahl 2014", "start_date": (2014, 5, 22), "end_date": (2014, 5, 25)},
         {"name": "Europawahl 2019", "start_date": (2019, 5, 23), "end_date": (2019, 5, 26)},
     ]
     num_days_before = 14  # Number of days before the election to include
     num_days_after = 14  # Number of days after the election to include
+
+    # retrieving list of links so that we dont have to make a request for each generated url to check for the random 01
+    # sat end
+    dct_2009 = {}
+    for month in ["05", "06"]:
+        url = f"https://dumps.wikimedia.org/other/pagecounts-raw/2009/2009-{month}/"  # Replace with your desired URL
+
+        # Send a GET request to the URL and retrieve the HTML content
+        response = requests.get(url)
+        html_content = response.text
+
+        # Parse the HTML content with Beautiful Soup
+        soup = BeautifulSoup(html_content, "html.parser")
+
+        # Find all the anchor tags (links)
+        links = soup.find_all("a")
+
+        # Extract the href attribute from each link and store them in a list
+        link_list = [
+            f"https://dumps.wikimedia.org/other/pagecounts-raw/2009/2009-{month}/{link.get('href')}" for link in links
+        ]
+        dct_2009[month] = link_list
 
     urls = []
 
@@ -42,26 +67,41 @@ def gen_urls() -> List[Dict[str, object]]:
             year = current_date.year
             month = current_date.month
             day = current_date.day
-            url = f"{base_url}{year}/{year}-{month:02d}/pageviews-{year}{month:02d}{day:02d}-user.bz2"
-            urls.append({"url": url, "id": f"{year}_{month:02d}_{day:02d}", "year": election["start_date"][0]})
+            if year == 2009:
+                base_url = "https://dumps.wikimedia.org/other/pagecounts-raw/2009/2009-"
+                for hour in range(24):
+                    url = f"{base_url}{month:02d}/pagecounts-2009{month:02d}{day:02d}-{hour:02d}0000.gz"
+                    if url not in dct_2009[f"{month:02d}"]:
+                        url = f"{base_url}{month:02d}/pagecounts-2009{month:02d}{day:02d}-{hour:02d}0001.gz"
+                    urls.append(
+                        {
+                            "url": url,
+                            "id": f"{year}_{month:02d}_{day:02d}_{hour:02d}",
+                            "year": election["start_date"][0],
+                        }
+                    )
+            else:
+                base_url = "https://dumps.wikimedia.org/other/pageview_complete/"
+                url = f"{base_url}{year}/{year}-{month:02d}/pageviews-{year}{month:02d}{day:02d}-user.bz2"
+                urls.append({"url": url, "id": f"{year}_{month:02d}_{day:02d}", "year": election["start_date"][0]})
             current_date += timedelta(days=1)
 
     return urls
 
 
-def bz2_to_parquet(input_filepath: str, id_: str) -> str:
+def compr_to_parquet(input_filepath: str, id_: str, year: int) -> str:
     """
-    Converts a BZ2 file to Parquet format, filtering and processing the data.
+    Converts a compressed file to Parquet format, filtering and processing the data.
 
     Args:
-        input_filepath (str): The path to the input BZ2 file.
+        input_filepath (str): The path to the input compressed file.
         id_ (str): The identifier associated with the data.
 
     Returns:
         str: The path to the output Parquet file.
 
     Note:
-        - This function reads the input BZ2 file, filters the data, and converts it to Parquet format.
+        - This function reads the input compressed file, filters the data, and converts it to Parquet format.
         - The data is filtered using the `process_data_line` function.
         - The resulting Parquet file will have the following schema:
           - 'wikicode': string
@@ -79,7 +119,6 @@ def bz2_to_parquet(input_filepath: str, id_: str) -> str:
         [
             ("wikicode", pa.string()),
             ("article_title", pa.string()),
-            ("daily_total", pa.int64()),
             ("hourly_counts", pa.string()),
         ]
     )
@@ -87,17 +126,22 @@ def bz2_to_parquet(input_filepath: str, id_: str) -> str:
     console.log(f"Starting conversion for {id_}")
     start_time = time.time()
     last_update_time = start_time
+    if year == 2009:
+        filetype = "gzip"
+    else:
+        filetype = "bz2"
 
-    with bz2.open(input_filepath, "rt") as file, ExitStack() as stack:
+    with eval(filetype).open(input_filepath, "rt") as file, ExitStack() as stack:
         parquet_writer = None
         while True:
             chunk = []
             for _ in range(chunk_size):
                 line = file.readline()
+
                 if not line:
                     break
 
-                dct = process_data_line(line)
+                dct = process_data_line(line, year)
 
                 if dct is not None:
                     chunk.append(dct)
