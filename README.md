@@ -31,7 +31,7 @@ BUCKET_SECRET_KEY=secret
 Having installed the requirements and initialized modal, you can run the retrieval_*.py files. 
 
 ### Data Analysis
-Start up your Jupyter server and open the corresponding notebooks.
+Start up your Jupyter server and run the corresponding notebooks.
 
 ## Quality Ensurance
 - Pre-Commit is set up to enforce linting with ruff and formatting with black

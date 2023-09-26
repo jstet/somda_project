@@ -6,7 +6,7 @@ from contextlib import ExitStack
 import pyarrow as pa
 import pyarrow.parquet as pq
 from typing import List, Dict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import bz2  # noqa: F401
 import gzip  # noqa: F401
 from bs4 import BeautifulSoup
@@ -203,3 +203,11 @@ def get_env_vars(environ: dict) -> tuple:
     secret_key = environ.get("BUCKET_SECRET_KEY")
     region = environ.get("BUCKET_REGION")
     return endpoint, bucket_id, access_key, secret_key, region
+
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    raise TypeError("Type %s not serializable" % type(obj))

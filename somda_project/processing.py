@@ -8,29 +8,6 @@ import copy
 from somda_project.console import console
 
 
-# def get_party_results(df, nested_dct):
-#     nested_dct_copy = copy.deepcopy(nested_dct)
-#     for key, val in nested_dct_copy.items():
-#         result = df[df["PARTY_ID"] == key]["VOTES_PERCENT"].values
-#         if len(result) != 0:
-#             val["result"] = result[0]
-#     return nested_dct_copy
-
-
-# def get_parties(df, eu_elections, year):
-#     eu_elections_copy = copy.deepcopy(eu_elections)
-#     for key, val in eu_elections_copy.items():
-#         temp = df[df["DIVISION_ID"] == key]
-#         party_dict = {}
-#         for _, row in temp.iterrows():
-#             party_id = row["ID"]
-#             party_label = row["LABEL"]
-#             party_dict[party_id] = {"label": party_label}
-#         val[year]["parties"] = party_dict
-
-#     return eu_elections_copy
-
-
 def get_turnout(df: pd.DataFrame, eu_elections: dict) -> dict:
     """
     Extracts turnout data from a DataFrame and updates a copy of the eu_elections dictionary.

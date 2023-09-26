@@ -1,72 +1,37 @@
 from somda_project.helpers import compr_to_parquet
 from somda_project.IO_handlers import upload_file, check_object_exists, retrieve_file, download_file
-from somda_project.processing import extract_election_page_timeseries, get_turnout
+from somda_project.processing import extract_election_page_timeseries
 from somda_project.console import console
 from somda_project.data import eu_elections
 import pandas as pd
 from typing import Any
-import json
-from datetime import date, datetime
 import os
 
 
-def json_serial(obj):
-    """JSON serializer for objects not serializable by default json code"""
-
-    if isinstance(obj, (datetime, date)):
-        return obj.isoformat()
-    raise TypeError("Type %s not serializable" % type(obj))
-
-
-def get_election_data(minio_client: Any, bucket_id: str) -> str:
+def get_election_data() -> str:
     """
-    Retrieves election data from external sources, processes it, and uploads the processed data as JSON.
-
-    Args:
-        minio_client (Any): The MinIO client object.
-        bucket_id (str): The ID of the bucket.
+    Downloads the election data from the European Parliament website, processes it, and returns the processed data.
 
     Returns:
-        str: The S3 path of the uploaded JSON file.
-
-    Note:
-        - This function retrieves the turnout data for eu elections from a URL and processes it using the
-          get_turnout function.
-        - The processed data is stored in the eu_elections_proc variable.
-        - The turnout data for the years 2014 and 2019 is retrieved from URLs,
-          processed using the get_parties function, and added to the eu_elections_proc variable.
-        - The eu_elections_proc data is saved as JSON in the eu_elections.json file.
-        - The JSON file is uploaded to the S3 server using the upload_file function.
-        - The JSON file is removed from the local file system.
-        - The S3 path of the uploaded JSON file is returned.
+        dict: The processed election data.
     """
     turnout_url = "https://www.europarl.europa.eu/election-results-2019/data-sheets/csv/turnout/turnout-country.csv"
     output_filepath, id_ = download_file({"url": turnout_url, "id": "turnout"}, "csv")
-    turnout = pd.read_csv(output_filepath, delimiter=";")
+    turnout_df = pd.read_csv(output_filepath, delimiter=";")
     os.remove(output_filepath)
-    eu_elections_proc = get_turnout(turnout, eu_elections)
-    # for year in [2014, 2019]:
-    #     url = f"https://www.europarl.europa.eu/election-results-2019/data-sheets/csv/{year}-{year+5}/election-results/parties.csv"
-    #     output_filepath, id_ = download_file({"url": url, "id": f"parties_{year}"}, "csv")
-    #     df = pd.read_csv(output_filepath, delimiter=";")
-    #     os.remove(output_filepath)
-    # eu_elections_proc = get_parties(df, eu_elections_proc, year)
-    # for key, value in eu_elections_proc.items():
-    #     url = f"https://www.europarl.europa.eu/election-results-2019/data-sheets/csv/{year}-{year+5}/election-results/results-parties/results-parties-{key.lower()}.csv"
-    #     output_filepath, id_ = download_file({"url": url, "id": f"{key}_results_{year}"}, "csv")
-    #     df = pd.read_csv(output_filepath, delimiter=";")
-    #     os.remove(output_filepath)
-    #     eu_elections_proc[key][year]["parties"] = get_party_results(df, eu_elections_proc[key][year]["parties"])
 
-    json_path = "eu_elections.json"
-    with open(json_path, "w") as outfile:
-        json.dump(eu_elections_proc, outfile, default=json_serial)
+    for key, val in eu_elections.items():
+        val[2019]["turnout"] = turnout_df.loc[
+            (turnout_df["YEAR"] == 2019) & (turnout_df["COUNTRY_ID"] == key), "RATE"
+        ].values[0]
+        val[2014]["turnout"] = turnout_df.loc[
+            (turnout_df["YEAR"] == 2014) & (turnout_df["COUNTRY_ID"] == key), "RATE"
+        ].values[0]
+        val[2009]["turnout"] = turnout_df.loc[
+            (turnout_df["YEAR"] == 2009) & (turnout_df["COUNTRY_ID"] == key), "RATE"
+        ].values[0]
 
-    s3_path = upload_file(minio_client, json_path, json_path, bucket_id)
-
-    os.remove(json_path)
-
-    return s3_path
+    return eu_elections
 
 
 def get_upload_parquet(url: dict, minio_client: Any, bucket_id: str) -> str:
