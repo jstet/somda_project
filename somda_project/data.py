@@ -179,12 +179,12 @@ eu_elections = {
         2019: {
             "election_date": date(2019, 5, 26),
             "article_names": [
-                "Elecciones_al_Parlamento_Europeo_de_2019_(Espa%C3%B1a)",
-                "Elecciones_al_Parlamento_Europeo_de_2019_(E]spaña)",
+                "Elecciones_al_Parlamento_Europeo_de_2019",
+                "Elecciones_al_Parlamento_Europeo_de_2019_(España)",
             ],
         },
     },
-    "SL": {
+    "SI": {
         "language": "slovenian",
         "wikicode": "sl.wikipedia",
         2009: {

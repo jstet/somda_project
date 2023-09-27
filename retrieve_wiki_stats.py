@@ -116,7 +116,7 @@ def main():
     client = create_minio_client(endpoint, access_key, secret_key, region)
     urls = gen_urls_.call()
     # list(get_uncompress_to_parquet_.map(urls))
-    list(get_timeseries_day_.map(urls))
+    # list(get_timeseries_day_.map(urls))
     merged = concat_csvs_.call(urls)
     csv = retrieve_file(client, merged, bucket_id)
     # in the column wikicode, remove .wikipedia

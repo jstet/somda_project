@@ -1,1 +1,360 @@
-{"CZ": {"language": "czech", "wikicode": "cs.wikipedia", "2009": {"election_date": "2009-06-05", "article_name": "Volby_do_Evropsk\u00e9ho_parlamentu_2009"}, "2014": {"election_date": "2014-05-23", "article_name": "Volby_do_Evropsk\u00e9ho_parlamentu_2014", "turnout": 18.2}, "2019": {"election_date": "2019-05-24", "article_name": "Volby_do_Evropsk\u00e9ho_parlamentu_2019", "turnout": 28.72}}, "DK": {"language": "danish", "wikicode": "da.wikipedia", "2009": {"election_date": "2009-06-07", "article_name": "Europa-Parlamentsvalg_2009"}, "2014": {"election_date": "2014-05-25", "article_name": "Europa-Parlamentsvalget_2014", "turnout": 56.32}, "2019": {"election_date": "2019-05-26", "article_name": "Europa-Parlamentsvalget_2019", "turnout": 66.08}}, "DE": {"language": "german", "wikicode": "de.wikipedia", "2009": {"election_date": "2009-06-07", "article_name": "Europawahl_2009"}, "2014": {"election_date": "2014-05-25", "article_name": "Europawahl_2014", "turnout": 48.1}, "2019": {"election_date": "2019-05-26", "article_name": "Europawahl_2019", "turnout": 61.38}}, "EL": {"language": "greek", "wikicode": "el.wikipedia", "2009": {"election_date": "2009-06-07", "article_name": "\u0395\u03c5\u03c1\u03c9\u03b5\u03ba\u03bb\u03bf\u03b3\u03ad\u03c2_2009"}, "2014": {"election_date": "2014-05-25", "article_name": "\u0395\u03c5\u03c1\u03c9\u03b5\u03ba\u03bb\u03bf\u03b3\u03ad\u03c2_2014", "turnout": 59.97}, "2019": {"election_date": "2019-05-26", "article_name": "\u0395\u03c5\u03c1\u03c9\u03b5\u03ba\u03bb\u03bf\u03b3\u03ad\u03c2_2019", "turnout": 58.69}}, "FI": {"language": "finish", "wikicode": "fi.wikipedia", "2009": {"election_date": "2009-06-07", "article_name": "Europarlamenttivaalit_2009"}, "2014": {"election_date": "2014-05-25", "article_name": "Europarlamenttivaalit_2014", "turnout": 39.1}, "2019": {"election_date": "2019-05-26", "article_name": "Europarlamenttivaalit_2019", "turnout": 40.8}}, "FR": {"language": "french", "wikicode": "fr.wikipedia", "2009": {"election_date": "2009-06-06", "article_name": "\u00c9lections_europ\u00e9ennes_de_2009"}, "2014": {"election_date": "2014-05-24", "article_name": "\u00c9lections_europ\u00e9ennes_de_2014", "turnout": 42.43}, "2019": {"election_date": "2019-05-25", "article_name": "\u00c9lections_europ\u00e9ennes_de_2019", "turnout": 50.12}}, "HU": {"language": "hungarian", "wikicode": "hu.wikipedia", "2009": {"election_date": "2009-06-07", "article_name": "2009-es_eur\u00f3pai_parlamenti_v\u00e1laszt\u00e1s"}, "2014": {"election_date": "2014-05-25", "article_name": "2014-es_magyarorsz\u00e1gi_orsz\u00e1ggy\u0171l\u00e9si_v\u00e1laszt\u00e1s", "turnout": 28.97}, "2019": {"election_date": "2019-05-26", "article_name": "2019-es_eur\u00f3pai_parlamenti_v\u00e1laszt\u00e1s", "turnout": 43.36}}, "IT": {"language": "italian", "wikicode": "it.wikipedia", "2009": {"election_date": "2009-06-06", "article_name": "Elezioni_europee_del_2009"}, "2014": {"election_date": "2014-05-25", "article_name": "Elezioni_europee_del_2014", "turnout": 57.22}, "2019": {"election_date": "2019-05-26", "article_name": "Elezioni_europee_del_2019", "turnout": 54.5}}, "NL": {"language": "dutch", "wikicode": "nl.wikipedia", "2009": {"election_date": "2009-06-04", "article_name": "Europese_Parlementsverkiezingen_2009"}, "2014": {"election_date": "2014-05-22", "article_name": "Europese_Parlementsverkiezingen_2014", "turnout": 37.32}, "2019": {"election_date": "2019-05-23", "article_name": "Europese_Parlementsverkiezingen_2019", "turnout": 41.93}}, "PL": {"language": "polish", "wikicode": "pl.wikipedia", "2009": {"election_date": "2009-06-07", "article_name": "Wybory_do_Parlamentu_Europejskiego_w_2009_roku"}, "2014": {"election_date": "2014-05-25", "article_name": "Wybory_do_Parlamentu_Europejskiego_w_2014_roku", "turnout": 23.83}, "2019": {"election_date": "2019-05-26", "article_name": "Wybory_do_Parlamentu_Europejskiego_w_2019_roku", "turnout": 45.68}}, "SE": {"language": "swedish", "wikicode": "sv.wikipedia", "2009": {"election_date": "2009-06-07", "article_name": "Europaparlamentsvalet_2009"}, "2014": {"election_date": "2014-05-25", "article_name": "Europaparlamentsvalet_2014", "turnout": 51.07}, "2019": {"election_date": "2019-05-26", "article_name": "Europaparlamentsvalet_2019", "turnout": 55.27}}, "ES": {"language": "spanish", "wikicode": "es.wikipedia", "2009": {"election_date": "2009-06-07", "article_name": "Elecciones_al_Parlamento_Europeo_de_2009"}, "2014": {"election_date": "2014-05-25", "article_name": "Elecciones_al_Parlamento_Europeo_de_2014", "turnout": 43.81}, "2019": {"election_date": "2019-05-26", "article_name": "Elecciones_al_Parlamento_Europeo_de_2019_(Espa\u00f1a)", "turnout": 60.73}}, "SI": {"language": "slovenian", "wikicode": "sl.wikipedia", "2009": {"election_date": "2009-06-07", "article_name": "Volitve_v_Evropski_parlament_2009"}, "2014": {"election_date": "2014-05-25", "article_name": "Volitve_v_Evropski_parlament_2014", "turnout": 24.55}, "2019": {"election_date": "2019-05-26", "article_name": "Volitve_v_Evropski_parlament_2019", "turnout": 28.89}}}
+{
+    "CZ": {
+        "language": "czech",
+        "wikicode": "cs.wikipedia",
+        "2009": {
+            "election_date": "2009-06-05",
+            "article_names": [
+                "Volby_do_Evropsk\u00e9ho_parlamentu_2009",
+                "Volby_do_Evropsk\u00e9ho_parlamentu_v_\u010cesku_2009"
+            ],
+            "turnout": 28.22
+        },
+        "2014": {
+            "election_date": "2014-05-23",
+            "article_names": [
+                "Volby_do_Evropsk\u00e9ho_parlamentu_2014",
+                "Volby_do_Evropsk\u00e9ho_parlamentu_v_\u010cesku_2014"
+            ],
+            "turnout": 18.2
+        },
+        "2019": {
+            "election_date": "2019-05-24",
+            "article_names": [
+                "Volby_do_Evropsk\u00e9ho_parlamentu_2019",
+                "Volby_do_Evropsk\u00e9ho_parlamentu_v_\u010cesku_2019"
+            ],
+            "turnout": 28.72
+        }
+    },
+    "DK": {
+        "language": "danish",
+        "wikicode": "da.wikipedia",
+        "2009": {
+            "election_date": "2009-06-07",
+            "article_names": [
+                "Europa-Parlamentsvalg_2009",
+                "Europa-Parlamentsvalget_2009_i_Danmark"
+            ],
+            "turnout": 59.54
+        },
+        "2014": {
+            "election_date": "2014-05-25",
+            "article_names": [
+                "Europa-Parlamentsvalg_2014",
+                "Europa-Parlamentsvalget_2014_i_Danmark"
+            ],
+            "turnout": 56.32
+        },
+        "2019": {
+            "election_date": "2019-05-26",
+            "article_names": [
+                "Europa-Parlamentsvalg_2019",
+                "Europa-Parlamentsvalget_2019_i_Danmark"
+            ],
+            "turnout": 66.08
+        }
+    },
+    "DE": {
+        "language": "german",
+        "wikicode": "de.wikipedia",
+        "2009": {
+            "election_date": "2009-06-07",
+            "article_names": [
+                "Europawahl_2009",
+                "Europawahl_2009_in_Deutschland"
+            ],
+            "turnout": 43.27
+        },
+        "2014": {
+            "election_date": "2014-05-25",
+            "article_names": [
+                "Europawahl_2014",
+                "Europawahl_2009_in_Deutschland"
+            ],
+            "turnout": 48.1
+        },
+        "2019": {
+            "election_date": "2019-05-26",
+            "article_names": [
+                "Europawahl_2019",
+                "Europawahl_2009_in_Deutschland"
+            ],
+            "turnout": 61.38
+        }
+    },
+    "EL": {
+        "language": "greek",
+        "wikicode": "el.wikipedia",
+        "2009": {
+            "election_date": "2009-06-07",
+            "article_names": [
+                "\u0395\u03c5\u03c1\u03c9\u03b5\u03ba\u03bb\u03bf\u03b3\u03ad\u03c2_2009",
+                "\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ad\u03c2_\u03b5\u03c5\u03c1\u03c9\u03b5\u03ba\u03bb\u03bf\u03b3\u03ad\u03c2_2009"
+            ],
+            "turnout": 52.54
+        },
+        "2014": {
+            "election_date": "2014-05-25",
+            "article_names": [
+                "\u0395\u03c5\u03c1\u03c9\u03b5\u03ba\u03bb\u03bf\u03b3\u03ad\u03c2_2014",
+                "\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ad\u03c2_\u03b5\u03c5\u03c1\u03c9\u03b5\u03ba\u03bb\u03bf\u03b3\u03ad\u03c2_2014"
+            ],
+            "turnout": 59.97
+        },
+        "2019": {
+            "election_date": "2019-05-26",
+            "article_names": [
+                "\u0395\u03c5\u03c1\u03c9\u03b5\u03ba\u03bb\u03bf\u03b3\u03ad\u03c2_2019",
+                "\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ad\u03c2_\u03b5\u03c5\u03c1\u03c9\u03b5\u03ba\u03bb\u03bf\u03b3\u03ad\u03c2_2019"
+            ],
+            "turnout": 58.69
+        }
+    },
+    "FI": {
+        "language": "finish",
+        "wikicode": "fi.wikipedia",
+        "2009": {
+            "election_date": "2009-06-07",
+            "article_names": [
+                "Europarlamenttivaalit_2009",
+                "Suomen_europarlamenttivaalit_2009"
+            ],
+            "turnout": 38.6
+        },
+        "2014": {
+            "election_date": "2014-05-25",
+            "article_names": [
+                "Europarlamenttivaalit_2014",
+                "Suomen_europarlamenttivaalit_2014"
+            ],
+            "turnout": 39.1
+        },
+        "2019": {
+            "election_date": "2019-05-26",
+            "article_names": [
+                "Europarlamenttivaalit_2019",
+                "Suomen_europarlamenttivaalit_2019"
+            ],
+            "turnout": 40.8
+        }
+    },
+    "FR": {
+        "language": "french",
+        "wikicode": "fr.wikipedia",
+        "2009": {
+            "election_date": "2009-06-06",
+            "article_names": [
+                "\u00c9lections_europ\u00e9ennes_de_2009_en_France",
+                "\u00c9lections_europ\u00e9ennes_de_2009"
+            ],
+            "turnout": 40.63
+        },
+        "2014": {
+            "election_date": "2014-05-24",
+            "article_names": [
+                "\u00c9lections_europ\u00e9ennes_de_2014_en_France",
+                "\u00c9lections_europ\u00e9ennes_de_2014"
+            ],
+            "turnout": 42.43
+        },
+        "2019": {
+            "election_date": "2019-05-25",
+            "article_names": [
+                "\u00c9lections_europ\u00e9ennes_de_2019_en_France",
+                "\u00c9lections_europ\u00e9ennes_de_2019"
+            ],
+            "turnout": 50.12
+        }
+    },
+    "HU": {
+        "language": "hungarian",
+        "wikicode": "hu.wikipedia",
+        "2009": {
+            "election_date": "2009-06-07",
+            "article_names": [
+                "2009-es_eur\u00f3pai_parlamenti_v\u00e1laszt\u00e1s"
+            ],
+            "turnout": 36.31
+        },
+        "2014": {
+            "election_date": "2014-05-25",
+            "article_names": [
+                "2014-es_magyarorsz\u00e1gi_orsz\u00e1ggy\u0171l\u00e9si_v\u00e1laszt\u00e1s"
+            ],
+            "turnout": 28.97
+        },
+        "2019": {
+            "election_date": "2019-05-26",
+            "article_names": [
+                "2019-es_eur\u00f3pai_parlamenti_v\u00e1laszt\u00e1s"
+            ],
+            "turnout": 43.36
+        }
+    },
+    "IT": {
+        "language": "italian",
+        "wikicode": "it.wikipedia",
+        "2009": {
+            "election_date": "2009-06-06",
+            "article_names": [
+                "Elezioni_europee_del_2019_in_Italia",
+                "Elezioni_europee_del_2009"
+            ],
+            "turnout": 66.47
+        },
+        "2014": {
+            "election_date": "2014-05-25",
+            "article_names": [
+                "Elezioni_europee_del_2019_in_Italia",
+                "Elezioni_europee_del_2014"
+            ],
+            "turnout": 57.22
+        },
+        "2019": {
+            "election_date": "2019-05-26",
+            "article_names": [
+                "Elezioni_europee_del_2019_in_Italia",
+                "Elezioni_europee_del_2019"
+            ],
+            "turnout": 54.5
+        }
+    },
+    "NL": {
+        "language": "dutch",
+        "wikicode": "nl.wikipedia",
+        "2009": {
+            "election_date": "2009-06-04",
+            "article_names": [
+                "Europese_Parlementsverkiezingen_2009"
+            ],
+            "turnout": 36.75
+        },
+        "2014": {
+            "election_date": "2014-05-22",
+            "article_names": [
+                "Europese_Parlementsverkiezingen_2014"
+            ],
+            "turnout": 37.32
+        },
+        "2019": {
+            "election_date": "2019-05-23",
+            "article_names": [
+                "Europese_Parlementsverkiezingen_2019"
+            ],
+            "turnout": 41.93
+        }
+    },
+    "PL": {
+        "language": "polish",
+        "wikicode": "pl.wikipedia",
+        "2009": {
+            "election_date": "2009-06-07",
+            "article_names": [
+                "Wybory_do_Parlamentu_Europejskiego_w_Polsce_w_2009_roku",
+                "Wybory_do_Parlamentu_Europejskiego_w_2009_roku"
+            ],
+            "turnout": 24.53
+        },
+        "2014": {
+            "election_date": "2014-05-25",
+            "article_names": [
+                "Wybory_do_Parlamentu_Europejskiego_w_Polsce_w_2014_roku",
+                "Wybory_do_Parlamentu_Europejskiego_w_2014_roku"
+            ],
+            "turnout": 23.83
+        },
+        "2019": {
+            "election_date": "2019-05-26",
+            "article_names": [
+                "Wybory_do_Parlamentu_Europejskiego_w_Polsce_w_2019_roku",
+                "Wybory_do_Parlamentu_Europejskiego_w_2019_roku"
+            ],
+            "turnout": 45.68
+        }
+    },
+    "SE": {
+        "language": "swedish",
+        "wikicode": "sv.wikipedia",
+        "2009": {
+            "election_date": "2009-06-07",
+            "article_names": [
+                "Europaparlamentsvalet_i_Sverige_2009",
+                "Europaparlamentsvalet_2009"
+            ],
+            "turnout": 45.53
+        },
+        "2014": {
+            "election_date": "2014-05-25",
+            "article_names": [
+                "Europaparlamentsvalet_i_Sverige_2014",
+                "Europaparlamentsvalet_2014"
+            ],
+            "turnout": 51.07
+        },
+        "2019": {
+            "election_date": "2019-05-26",
+            "article_names": [
+                "Europaparlamentsvalet_i_Sverige_2019",
+                "Europaparlamentsvalet_2019"
+            ],
+            "turnout": 55.27
+        }
+    },
+    "ES": {
+        "language": "spanish",
+        "wikicode": "es.wikipedia",
+        "2009": {
+            "election_date": "2009-06-07",
+            "article_names": [
+                "Elecciones_al_Parlamento_Europeo_de_2009_(Espa%C3%B1a)",
+                "Elecciones_al_Parlamento_Europeo_de_2009"
+            ],
+            "turnout": 44.87
+        },
+        "2014": {
+            "election_date": "2014-05-25",
+            "article_names": [
+                "Elecciones_al_Parlamento_Europeo_de_2014_(Espa%C3%B1a)",
+                "Elecciones_al_Parlamento_Europeo_de_2014"
+            ],
+            "turnout": 43.81
+        },
+        "2019": {
+            "election_date": "2019-05-26",
+            "article_names": [
+                "Elecciones_al_Parlamento_Europeo_de_2019_(Espa%C3%B1a)",
+                "Elecciones_al_Parlamento_Europeo_de_2019_(E]spa\u00f1a)"
+            ],
+            "turnout": 60.73
+        }
+    },
+    "SI": {
+        "language": "slovenian",
+        "wikicode": "sl.wikipedia",
+        "2009": {
+            "election_date": "2009-06-07",
+            "article_names": [
+                "Volitve_v_Evropski_parlament_2009",
+                "Volitve_poslancev_iz_Slovenije_v_Evropski_parlament_2009"
+            ],
+            "turnout": 28.37
+        },
+        "2014": {
+            "election_date": "2014-05-25",
+            "article_names": [
+                "Volitve_v_Evropski_parlament_2014",
+                "Volitve_poslancev_iz_Slovenije_v_Evropski_parlament_2014"
+            ],
+            "turnout": 24.55
+        },
+        "2019": {
+            "election_date": "2019-05-26",
+            "article_names": [
+                "Volitve_v_Evropski_parlament_2019",
+                "Volitve_poslancev_iz_Slovenije_v_Evropski_parlament_2019"
+            ],
+            "turnout": 28.89
+        }
+    }
+}
