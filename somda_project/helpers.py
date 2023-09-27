@@ -1,14 +1,6 @@
-from somda_project.console import console
-from somda_project.processing import process_data_line
 import requests
-import time
-from contextlib import ExitStack
-import pyarrow as pa
-import pyarrow.parquet as pq
 from typing import List, Dict
 from datetime import datetime, timedelta, date
-import bz2  # noqa: F401
-import gzip  # noqa: F401
 from bs4 import BeautifulSoup
 
 
@@ -87,91 +79,6 @@ def gen_urls() -> List[Dict[str, object]]:
             current_date += timedelta(days=1)
 
     return urls
-
-
-def compr_to_parquet(input_filepath: str, id_: str, year: int) -> str:
-    """
-    Converts a compressed file to Parquet format, filtering and processing the data.
-
-    Args:
-        input_filepath (str): The path to the input compressed file.
-        id_ (str): The identifier associated with the data.
-
-    Returns:
-        str: The path to the output Parquet file.
-
-    Note:
-        - This function reads the input compressed file, filters the data, and converts it to Parquet format.
-        - The data is filtered using the `process_data_line` function.
-        - The resulting Parquet file will have the following schema:
-          - 'wikicode': string
-          - 'article_title': string
-          - 'daily_total': int64
-          - 'hourly_counts': string
-        - The output Parquet file will be named '<id>.parquet', where <id> is the provided identifier.
-        - The progress and position in the uncompressed file will be logged every 10 seconds.
-        - The conversion time will be logged upon completion.
-    """
-    chunk_size = 100000
-    output_file = f"{id_}.parquet"
-
-    parquet_schema = pa.schema(
-        [
-            ("wikicode", pa.string()),
-            ("article_title", pa.string()),
-            ("hourly_counts", pa.string()),
-        ]
-    )
-
-    console.log(f"Starting conversion for {id_}")
-    start_time = time.time()
-    last_update_time = start_time
-    if year == 2009:
-        filetype = "gzip"
-    else:
-        filetype = "bz2"
-
-    with eval(filetype).open(input_filepath, "rt") as file, ExitStack() as stack:
-        parquet_writer = None
-        while True:
-            chunk = []
-            for _ in range(chunk_size):
-                line = file.readline()
-
-                if not line:
-                    break
-
-                dct = process_data_line(line, year)
-
-                if dct is not None:
-                    chunk.append(dct)
-
-            if chunk:
-                arrays = [pa.array([row[col] for row in chunk]) for col in chunk[0]]
-                table = pa.Table.from_arrays(arrays, schema=parquet_schema)
-                if parquet_writer is None:
-                    parquet_writer = stack.enter_context(pq.ParquetWriter(output_file, parquet_schema))
-
-                parquet_writer.write_table(table)
-
-            if not line:
-                break
-
-            current_time = time.time()
-            elapsed_time = current_time - last_update_time
-            if elapsed_time >= 10:
-                last_update_time = current_time
-                file_position = file.tell()
-                console.log(
-                    f"Current position in uncompressed file with id {id_}: {round(file_position / (1024 ** 3), 2)} GB"
-                )
-
-    if parquet_writer is not None:
-        parquet_writer.close()
-
-    console.log(f"Conversion time for {id_}: {round(time.time() - start_time, 2)} seconds")
-
-    return output_file
 
 
 def get_env_vars(environ: dict) -> tuple:

@@ -35,7 +35,7 @@ Start up your Jupyter server and run the corresponding notebooks.
 
 ## Quality Ensurance
 - Pre-Commit is set up to enforce linting with ruff and formatting with black
-- pytest is used for unit testing, run `poetry run pytest` to start testing
+- pytest is used for unit testing, run `poetry run pytest` to start testing. Note that required files are not part of this repo due to their size and have to be downloaded manually.
 
 
 

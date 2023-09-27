@@ -1,5 +1,4 @@
-from somda_project.helpers import compr_to_parquet
-from somda_project.IO_handlers import upload_file, check_object_exists, retrieve_file, download_file
+from somda_project.IO_handlers import upload_file, retrieve_file, download_file
 from somda_project.processing import extract_election_page_timeseries
 from somda_project.console import console
 from somda_project.data import eu_elections
@@ -34,7 +33,7 @@ def get_election_data() -> str:
     return eu_elections
 
 
-def get_upload_parquet(url: dict, minio_client: Any, bucket_id: str) -> str:
+def get_uncompress_to_parquet(url: dict, minio_client: Any, bucket_id: str) -> str:
     """
     Downloads a file from the specified URL, converts it to Parquet format, and uploads it.
 
@@ -53,16 +52,6 @@ def get_upload_parquet(url: dict, minio_client: Any, bucket_id: str) -> str:
         - The original and converted files are deleted after processing.
         - The Parquet file is uploaded to the S3 server using the upload_file function.
     """
-    if not check_object_exists(minio_client, f"{url['id']}.parquet", bucket_id):
-        if url["year"] == 2009:
-            compr_path, id_ = download_file(url, "gz")
-        else:
-            compr_path, id_ = download_file(url)
-        output_filepath = compr_to_parquet(compr_path, id_, url["year"])
-        os.remove(compr_path)
-        s3_path = upload_file(minio_client, f"{id_}.parquet", output_filepath, bucket_id)
-        os.remove(output_filepath)
-        return s3_path
 
 
 def get_timeseries_day(url: dict, minio_client: Any, bucket_id: str) -> str:

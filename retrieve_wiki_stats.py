@@ -1,6 +1,13 @@
-from somda_project.pipelines import get_upload_parquet, get_timeseries_day, concat_csvs
+from somda_project.pipelines import get_timeseries_day, concat_csvs
 from somda_project.helpers import gen_urls, get_env_vars
-from somda_project.IO_handlers import create_minio_client, retrieve_file
+from somda_project.IO_handlers import (
+    create_minio_client,
+    retrieve_file,
+    upload_file,
+    download_file,
+    check_object_exists,
+)
+from somda_project.converting import compr_filter_to_parquet
 from dotenv import load_dotenv
 import modal
 import os
@@ -13,10 +20,19 @@ stub = modal.Stub(name="somda_project")
 
 
 @stub.function(image=image, timeout=1500, secret=modal.Secret.from_dotenv(__file__), concurrency_limit=100)
-def get_upload_parquet_(url):
+def get_uncompress_to_parquet_(url):
     endpoint, bucket_id, access_key, secret_key, region = get_env_vars(os.environ)
     client = create_minio_client(endpoint, access_key, secret_key, region)
-    get_upload_parquet(url, client, bucket_id)
+    if not check_object_exists(client, f"{url['id']}.parquet", bucket_id):
+        if url["year"] == 2009:
+            compr_path, id_ = download_file(url, "gz")
+        else:
+            compr_path, id_ = download_file(url)
+        output_filepath = compr_filter_to_parquet(compr_path, id_, url["year"])
+        os.remove(compr_path)
+        s3_path = upload_file(client, f"{id_}.parquet", output_filepath, bucket_id)
+        os.remove(output_filepath)
+        return s3_path
 
 
 @stub.function(image=image, timeout=1000, secret=modal.Secret.from_dotenv(__file__))
@@ -43,7 +59,7 @@ def main():
     endpoint, bucket_id, access_key, secret_key, region = get_env_vars(os.environ)
     client = create_minio_client(endpoint, access_key, secret_key, region)
     urls = f4.call()
-    list(get_upload_parquet_.map(urls))
+    list(get_uncompress_to_parquet_.map(urls))
     list(get_timeseries_day_.map(urls))
     merged = concat_csvs_.call(urls)
     csv = retrieve_file(client, merged, bucket_id)

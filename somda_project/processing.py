@@ -1,8 +1,6 @@
 import duckdb
 from somda_project.data import hour_mapping
-import urllib
-import re
-from typing import Optional, Dict
+from typing import Dict
 import pandas as pd
 import copy
 from somda_project.console import console
@@ -143,58 +141,6 @@ def extract_election_page_timeseries(input_filepath: str, id_: str, year: int, e
     output = f"{id_}.csv"
     df.to_csv(output, index=False)
     return output
-
-
-def process_data_line(line: str, year: int) -> Optional[dict]:
-    """
-    Processes a line of data and extracts relevant information.
-
-    Args:
-        line (str): A line of data to be processed.
-
-    Returns:
-        dict or None: A dictionary containing the extracted information if it meets the criteria,
-                      or None if the line does not match the expected pattern.
-
-    Note:
-        The expected pattern for a valid line is:
-        "<wikicode> <article_title> ... <daily_total> <hourly_counts>"
-
-        The function performs the following steps:
-        - Splits the line by spaces to extract individual parts.
-        - Decodes URL-encoded parts using urllib.parse.unquote.
-        - Extracts the wikicode, article_title, daily_total, and hourly_counts from the parts.
-        - Constructs a dictionary with the extracted information.
-        - Filters the dictionary to keep only data related to Wikipedia articles.
-    """
-
-    try:
-        parts = line.strip().split(" ")
-        wikicode = urllib.parse.unquote(parts[0])
-        article_title = urllib.parse.unquote(parts[1])
-        if year == 2009:
-            hourly_counts = parts[2]
-        else:
-            hourly_counts = parts[-1]
-        dct = {
-            "wikicode": wikicode,
-            "article_title": article_title,
-            "hourly_counts": hourly_counts,
-        }
-
-        if year != 2009:
-            # keep only stuff from wikipedia project and only articles (they don't start with a namespace)
-            if "wikipedia" in dct["wikicode"] and not re.match(r"^\w+:", dct["article_title"]):
-                return dct
-        else:
-            if "." not in dct["wikicode"] and not re.match(r"^\w+:", dct["article_title"]):
-                return dct
-    # sometimes its a line like: "de.wikipedia Versuchstelle_Gottow"
-    except ValueError as e:
-        print(e)
-        console.log(e)
-        console.log(line)
-        return None
 
 
 def decipher_hours(hourly_counts: str) -> Dict[int, int]:
