@@ -1,4 +1,7 @@
 \chapter{Methods}
 \label{sec:methods}
 
-Detail the data analysis and statistical methods. Justify your choice.
+In this replication study, I utilize methods that overlap with those employed in the paper by Yasseri et al. The objective is to analyze the relationship between Wikipedia page views and turnout in the EU elections by employing the Pearson Correlation Coefficient. In the analysis, I consider the relative change in page views as the independent variable and the relative change in turnout between two elections as the dependent variable. While Yasseri et al. do not provide explicit details on how they calculated the "volume of attention in the build-up phase" used to determine the relative change in page views, I assume it refers to the summation of all page views within a predetermined timeframe preceding the election date. The formula for relativ change is obviously:$$
+\text{{Relative Change}} = \frac{{\text{{new value}} - \text{{initial value}}}}{{\text{{initial value}}}}
+$$
+Pearson's correlation coefficient is calculated by dividing the covariance of the two variables by the product of their standard deviations, but in this project this is automated using the \texttt{scipy.stats.pearsonr} function. The Pearson Correlation Coefficient is a commonly used statistical measure that helps assess the strength and direction of relationships between variables. It is valuable for understanding the level of association between two variables and can be utilized to uncover patterns or trends within the data. The strength of the relationship, indicated by how close the value is to 1 (or -1), can validate or refute the hypothesis that Wikipedia page views are a predictor for turnout.

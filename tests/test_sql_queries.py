@@ -26,6 +26,11 @@ def test_extract_page():
     # Test for year 2019
     resource_path = importlib_resources.files("tests.data.pageviews_parquet").joinpath("20190526.parquet")
     input_filepath = str(resource_path)
-    result = extract_page(input_filepath, "cs.wikipedia", "Volby_do_Evropského_parlamentu_2019")
-    expected_result = ("cs.wikipedia", "Volby_do_Evropského_parlamentu_2019", "I1L1S1V4W1")
+    result = extract_page(input_filepath, "de.wikipedia", "Europawahl_2019")
+    print(result)
+    expected_result = (
+        "de.wikipedia",
+        "Europawahl_2019",
+        "A9B13C13D12E19F51G68H86I103J98K121L92M77N81O85P97Q152R156S163T170U204V147W72X20",
+    )
     assert result == expected_result

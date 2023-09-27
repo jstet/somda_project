@@ -148,3 +148,22 @@ def get_election_data() -> str:
         ].values[0]
 
     return eu_elections
+
+
+def lineplot(df, ax, show_inset=False, fig=None):
+    ax.set_xlabel("")
+    ax.set_ylabel("Normalized Daily Page Views")
+    ax.margins(y=0)
+    ax.plot(df)
+    ax.tick_params(axis="x", labelrotation=45)
+
+    if show_inset:
+        left, bottom, width, height = [0.2, 0.6, 0.2, 0.2]
+        ax2 = fig.add_axes([left, bottom, width, height])
+        ax2.plot(df)
+        ax2.set_yscale("log", base=10)
+        ax2.set_xticklabels([])
+        ax2.tick_params(labeltop=True, labelright=True)
+
+    # Add color legend
+    ax.legend(df.columns)

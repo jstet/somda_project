@@ -21,7 +21,7 @@ def extract_page(input_filepath: str, wikicode: str, page_name: str) -> tuple:
     temp = duckdb.query(f"""
     SELECT *
     FROM '{input_filepath}'
-    WHERE  contains(article_title, '{page_name}') AND wikicode = '{wikicode}'
+    WHERE  article_title = '{page_name}' AND wikicode = '{wikicode}'
    
     """).fetchall()
     if temp:
