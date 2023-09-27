@@ -25,18 +25,6 @@
 # region = os.environ.get("BUCKET_REGION")
 
 
-# # def test_process_data_line():
-# #     line = "als.wikipedia Spezial:ISBN-Suech/3883090387 desktop 1 L1"
-# #     temp = process_data_line(line)
-# #     assert temp is None
-# #     line = "als.wikipedia Darmstadtium desktop 1 I1"
-# #     temp = process_data_line(line)
-# #     assert temp == {
-# #         "wikicode": "als.wikipedia",
-# #         "article_title": "Darmstadtium",
-# #         "daily_total": 1,
-# #         "hourly_counts": "I1",
-# #     }
 # #
 # #
 # # def test_decipher_hours():

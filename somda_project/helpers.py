@@ -2,6 +2,10 @@ import requests
 from typing import List, Dict
 from datetime import datetime, timedelta, date
 from bs4 import BeautifulSoup
+from somda_project.IO_handlers import download_file
+from somda_project.data import eu_elections
+import pandas as pd
+import os
 
 
 def gen_urls() -> List[Dict[str, object]]:
@@ -118,3 +122,29 @@ def json_serial(obj):
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
     raise TypeError("Type %s not serializable" % type(obj))
+
+
+def get_election_data() -> str:
+    """
+    Downloads the election data from the European Parliament website, processes it, and returns the processed data.
+
+    Returns:
+        dict: The processed election data.
+    """
+    turnout_url = "https://www.europarl.europa.eu/election-results-2019/data-sheets/csv/turnout/turnout-country.csv"
+    output_filepath, id_ = download_file({"url": turnout_url, "id": "turnout"}, "csv")
+    turnout_df = pd.read_csv(output_filepath, delimiter=";")
+    os.remove(output_filepath)
+
+    for key, val in eu_elections.items():
+        val[2019]["turnout"] = turnout_df.loc[
+            (turnout_df["YEAR"] == 2019) & (turnout_df["COUNTRY_ID"] == key), "RATE"
+        ].values[0]
+        val[2014]["turnout"] = turnout_df.loc[
+            (turnout_df["YEAR"] == 2014) & (turnout_df["COUNTRY_ID"] == key), "RATE"
+        ].values[0]
+        val[2009]["turnout"] = turnout_df.loc[
+            (turnout_df["YEAR"] == 2009) & (turnout_df["COUNTRY_ID"] == key), "RATE"
+        ].values[0]
+
+    return eu_elections

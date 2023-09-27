@@ -1,5 +1,7 @@
-from somda_project.pipelines import get_timeseries_day, concat_csvs
 from somda_project.helpers import gen_urls, get_env_vars
+from somda_project.console import console
+from somda_project.data import eu_elections
+from somda_project.processing import extract_election_page_timeseries
 from somda_project.IO_handlers import (
     create_minio_client,
     retrieve_file,
@@ -10,6 +12,7 @@ from somda_project.IO_handlers import (
 from somda_project.converting import compr_filter_to_parquet
 from dotenv import load_dotenv
 import modal
+import pandas as pd
 import os
 
 load_dotenv()
@@ -39,18 +42,41 @@ def get_uncompress_to_parquet_(url):
 def get_timeseries_day_(url):
     endpoint, bucket_id, access_key, secret_key, region = get_env_vars(os.environ)
     client = create_minio_client(endpoint, access_key, secret_key, region)
-    return get_timeseries_day(url, client, bucket_id)
+    id_ = url["id"]
+    year = url["year"]
+    console.log(f"Retrieving parquet file for {id_}")
+    parquet = retrieve_file(client, f"{id_}.parquet", bucket_id)
+    console.log(f"Extracting election page views for {id_}")
+    output_csv = extract_election_page_timeseries(parquet, id_, year, eu_elections)
+    os.remove(parquet)
+    console.log(f"Uploading csv for {id_}")
+    s3_path = upload_file(client, output_csv, output_csv, bucket_id)
+    os.remove(output_csv)
+    return s3_path
 
 
 @stub.function(image=image, timeout=1000, secret=modal.Secret.from_dotenv(__file__))
 def concat_csvs_(urls):
     endpoint, bucket_id, access_key, secret_key, region = get_env_vars(os.environ)
     client = create_minio_client(endpoint, access_key, secret_key, region)
-    return concat_csvs(urls, client, bucket_id)
+    lst = []
+    for url in urls:
+        id_ = url["id"]
+        console.log(f"Retrieving csv file for {id_}")
+        csv = retrieve_file(client, f"{id_}.csv", bucket_id)
+        df = pd.read_csv(csv)
+        os.remove(csv)
+        lst.append(df)
+    merged_df = pd.concat(lst, ignore_index=True)
+    merged_df["hourly_views"] = merged_df["hourly_views"].astype("Int64")
+    output = "merged_election_pages.csv"
+    merged_df.to_csv(output, index=False)
+    s3_path = upload_file(client, output, output, bucket_id)
+    return s3_path
 
 
 @stub.function(image=image, timeout=1500)
-def f4():
+def gen_urls_():
     return gen_urls()
 
 
@@ -58,7 +84,7 @@ def f4():
 def main():
     endpoint, bucket_id, access_key, secret_key, region = get_env_vars(os.environ)
     client = create_minio_client(endpoint, access_key, secret_key, region)
-    urls = f4.call()
+    urls = gen_urls_.call()
     list(get_uncompress_to_parquet_.map(urls))
     list(get_timeseries_day_.map(urls))
     merged = concat_csvs_.call(urls)

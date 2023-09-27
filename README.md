@@ -26,6 +26,7 @@ BUCKET_REGION=region
 BUCKET_ACCESS_KEY_ID=key_id
 BUCKET_SECRET_KEY=secret
 ```
+4. Initialize pre-commit
 
 ### Data Retrieval
 Having installed the requirements and initialized modal, you can run the retrieval_*.py files. 

@@ -1,4 +1,4 @@
-from somda_project.pipelines import get_election_data
+from somda_project.helpers import get_election_data
 
 
 def test_get_election_data():
